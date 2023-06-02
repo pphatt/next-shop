@@ -68,7 +68,7 @@ export default function Home() {
               <div className={styles["content-wrapper"]}>
                 <div className={styles["content-header"]}>
                   <div className={styles["content-title"]}>
-                    <h2>THIS WEEK'S NEW FIGURE RELEASES</h2>
+                    <h2>THIS WEEK&rsquoS NEW FIGURE RELEASES</h2>
                     <h1>Check out our latest and greatest</h1>
                   </div>
                   <div className={styles["content-marker"]}>
