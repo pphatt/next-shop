@@ -51,7 +51,7 @@ const items: { figure: { name: string; image: string } }[] = [
     figure: {
       name: "figma Movie Jujutsu Kaisen 0 Yuta Okkotsu",
       image:
-        "https://product.hstatic.net/1000160337/product/figma_movie_jujutsu_kaisen_0_yuta_okkotsu__2__e2cee8ed1f694140b7371321e0fa881e_master.jpg",
+        "https://product.hstatic.net/1000160337/product/de_is_it_wrong_to_try_to_pick_up_girls_in_a_dungeon_iv_bell_cranel__6__52cd638fd39a4841b5092ce98517f101_master.jpg",
     },
   },
   {
@@ -63,15 +63,13 @@ const items: { figure: { name: string; image: string } }[] = [
   },
 ];
 
-const length = items.length;
-
 const createItem = (
   active_index: number,
-  index: number,
+  index: number
 ): {
   styles: {
     transform: string;
-    opacity?: string;
+    transitionDuration: string;
   };
 
   figure:
@@ -84,54 +82,30 @@ const createItem = (
   const default_width: number = 338.75 + 15;
 
   let x = 0;
-  let opacity = "0";
 
-  if (length - 2 + active_index < length) {
-    if (length - 2 + active_index === index) {
-      x = -2 * default_width;
-    }
-  } else if (length - 2 + active_index >= length) {
-    if (length - 2 + active_index - length === index) {
-      x = -2 * default_width;
-    }
+  // 6 + 0 === 6
+  // 7 + 0 === 7
+
+  // 6 + 1 === 7
+  // 7 + 1 === 8 !< 8 => 0
+
+  if (items.length - 2 + active_index < items.length) {
+    x = -2 * default_width;
   }
 
-  if (length - 1 + active_index < length) {
-    if (length - 1 + active_index === index) {
-      x = -1 * default_width;
-    }
-  } else if (length - 1 + active_index >= length) {
-    if (length - 1 + active_index - length === index) {
-      x = -1 * default_width;
-    }
-  }
-
-  if (x === 0) {
-    if (active_index >= index) {
-      if (active_index === index) {
-        x = Math.abs(index - active_index) * default_width;
-      } else {
-        let num = length - 3 - index;
-
-        if (num > 0) {
-          x = (length - active_index + index) * default_width;
-        } else {
-          x = (length - 3 - index) * default_width;
-        }
-      }
-    } else {
-      x = Math.abs(index - active_index) * default_width;
-    }
-  }
-
-  if (0 <= x && x <= 1061.25) {
-    opacity = "1";
-  }
+  // if ((items.length - 3) - active_index + 2 === 1) {
+  //   x = -default_width;
+  // } else if ((items.length - 3) - active_index + 1 === 2) {
+  //   x = -2 * default_width;
+  // } else {
+  //   x = Math.abs(index - active_index) * default_width;
+  // }
 
   return {
+    // styles: `transform: translate(${x}px, 0px), transition-duration: "300ms"`,
     styles: {
       transform: `translate(${x}px, 0px)`,
-      opacity,
+      transitionDuration: "300ms",
     },
     figure: items.at(index)?.figure,
   };
@@ -186,13 +160,14 @@ const CreateItemElement = ({
 export default function Home() {
   // position === active_index
   const [position, setPosition] = useState(0);
+  // const [index, setIndex] = useState(0);
 
   const setPrev = () => {
-    setPosition(position - 1 < 0 ? length - 1 : position - 1);
+    setPosition(position < 0 ? items.length : position - 1);
   };
 
   const setNext = () => {
-    setPosition(position + 1 < length ? position + 1 : 0);
+    setPosition(position < items.length ? position + 1 : 0);
   };
 
   return (
@@ -243,12 +218,8 @@ export default function Home() {
                   <button onClick={() => setPrev()}>Prev</button>
 
                   <div className={styles["carousel"]}>
-                    {[...Array(length)].map((_, index) => (
-                      <CreateItemElement
-                        position={position}
-                        index={index}
-                        key={index}
-                      />
+                    {[...Array(items.length)].map((_, index) => (
+                      <CreateItemElement position={position} index={index} />
                     ))}
                   </div>
 

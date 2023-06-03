@@ -251,7 +251,7 @@
     display: flex;
 
     width: 100%;
-    height: 100%;
+    height: 620.25px;
     z-index: 1;
     transition-property: transform;
     box-sizing: content-box;
@@ -259,7 +259,7 @@
 }
 
 .product {
-  position: relative;
+  position: absolute;
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
@@ -273,7 +273,7 @@
   background: #fff;
 
   height: 100%;
-  transition-property: transform;
+  transition: all 0.3s;
 
   .product-wrapper {
     display: flex;
