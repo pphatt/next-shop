@@ -128,26 +128,32 @@
   align-items: center;
   flex-wrap: wrap;
   flex-shrink: 0;
+
   height: fit-content;
   width: fit-content;
   min-height: 25px;
-  //padding: 10px;
+
   font-size: 0.875rem;
   line-height: 1rem;
   font-weight: 600;
+
   cursor: pointer;
   text-align: center;
-  //border-radius: 0.3rem;
-  text-transform: uppercase;
-  background-color: white;
-  color: black;
-  -webkit-text-decoration-line: none;
-  text-decoration-line: none;
-  border: 2px solid black;
-  -webkit-user-select: none;
-  user-select: none;
 
   padding: 8px 10px 6px 10px;
+
+  background-color: white;
+  color: black;
+  border: 2px solid black;
+  border-radius: 0;
+
+  text-transform: uppercase;
+
+  -webkit-text-decoration-line: none;
+  text-decoration-line: none;
+
+  -webkit-user-select: none;
+  user-select: none;
 
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);

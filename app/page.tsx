@@ -2,199 +2,10 @@
 import styles from "@/styles/index.module.scss";
 import NavigationBar from "@/components/navigation-bar";
 import Footer from "@/components/footer";
-import { useState } from "react";
-
-const items: { figure: { name: string; image: string } }[] = [
-  {
-    figure: {
-      name: "Some chinese figure",
-      image:
-        "https://theme.hstatic.net/1000160337/1000885200/14/home_collection_1_banner.jpg?v=307",
-    },
-  },
-  {
-    figure: {
-      name: "Eria the Water Charmer",
-      image:
-        "https://product.hstatic.net/1000160337/product/i-oh__card_game_monster_figure_collection_eria_the_water_charmer_1__6__cd47723e89b649f19e6ff632801645d2_master.jpg",
-    },
-  },
-  {
-    figure: {
-      name: "Hiita the Fire Charmer",
-      image:
-        "https://product.hstatic.net/1000160337/product/i-oh__card_game_monster_figure_collection_hiita_the_fire_charmer_1__2__15356952de204ffda4fd2b828af1c59d_master.jpg",
-    },
-  },
-  {
-    figure: {
-      name: "Lycoris Recoil Takina Inoue",
-      image:
-        "https://product.hstatic.net/1000160337/product/lycoris_recoil_takina_inoue_1__7__fd6a52effada40cea30fc85e3790f334_master.jpg",
-    },
-  },
-  {
-    figure: {
-      name: "Atelier Sophie: The Alchemist of the Mysterious Book Corneria",
-      image:
-        "https://product.hstatic.net/1000160337/product/atelier_sophie_the_alchemist_of_the_mysterious_book_corneria_1__1__37fc74dc69f64fa7b034a3a269b64248_master.jpg",
-    },
-  },
-  {
-    figure: {
-      name: "POP UP PARADE Is It Wrong to Try to Pick Up Girls in a Dungeon? IV Bell Cranel",
-      image:
-        "https://product.hstatic.net/1000160337/product/de_is_it_wrong_to_try_to_pick_up_girls_in_a_dungeon_iv_bell_cranel__6__52cd638fd39a4841b5092ce98517f101_master.jpg",
-    },
-  },
-  {
-    figure: {
-      name: "figma Movie Jujutsu Kaisen 0 Yuta Okkotsu",
-      image:
-        "https://product.hstatic.net/1000160337/product/figma_movie_jujutsu_kaisen_0_yuta_okkotsu__2__e2cee8ed1f694140b7371321e0fa881e_master.jpg",
-    },
-  },
-  {
-    figure: {
-      name: "ARTFX J TRIGUN STAMPEDE Vash the Stampede TRIGUN STAMPEDE Ver.",
-      image:
-        "https://product.hstatic.net/1000160337/product/artfx_j_trigun_stampede_vash_the_stampede_trigun_stampede_ver._1__4__2598a427ef994870bf17f93827274810_master.jpg",
-    },
-  },
-];
-
-const length = items.length;
-
-const createItem = (
-  active_index: number,
-  index: number,
-): {
-  styles: {
-    transform: string;
-    opacity?: string;
-  };
-
-  figure:
-    | {
-        name: string;
-        image: string;
-      }
-    | undefined;
-} => {
-  const default_width: number = 338.75 + 15;
-
-  let x = 0;
-  let opacity = "0";
-
-  if (length - 2 + active_index < length) {
-    if (length - 2 + active_index === index) {
-      x = -2 * default_width;
-    }
-  } else if (length - 2 + active_index >= length) {
-    if (length - 2 + active_index - length === index) {
-      x = -2 * default_width;
-    }
-  }
-
-  if (length - 1 + active_index < length) {
-    if (length - 1 + active_index === index) {
-      x = -1 * default_width;
-    }
-  } else if (length - 1 + active_index >= length) {
-    if (length - 1 + active_index - length === index) {
-      x = -1 * default_width;
-    }
-  }
-
-  if (x === 0) {
-    if (active_index >= index) {
-      if (active_index === index) {
-        x = Math.abs(index - active_index) * default_width;
-      } else {
-        let num = length - 3 - index;
-
-        if (num > 0) {
-          x = (length - active_index + index) * default_width;
-        } else {
-          x = (length - 3 - index) * default_width;
-        }
-      }
-    } else {
-      x = Math.abs(index - active_index) * default_width;
-    }
-  }
-
-  if (0 <= x && x <= 1061.25) {
-    opacity = "1";
-  }
-
-  return {
-    styles: {
-      transform: `translate(${x}px, 0px)`,
-      opacity,
-    },
-    figure: items.at(index)?.figure,
-  };
-};
-
-const CreateItemElement = ({
-  position,
-  index,
-}: {
-  position: number;
-  index: number;
-}) => {
-  const item = createItem(position, index);
-
-  return (
-    <div className={styles["product"]} style={item.styles}>
-      <div className={styles["product-wrapper"]}>
-        <a href={"/"}>
-          <div className={styles["product-image"]}>
-            <div className={styles["product-image-wrapper"]}>
-              <div className={styles["inner-wrapper"]}>
-                <div className={styles["container-wrapper"]}>
-                  <picture>
-                    <source
-                      media={"(min-width:768px)"}
-                      srcSet={item.figure?.image}
-                    />
-                    <img
-                      src="https://theme.hstatic.net/1000160337/1000885200/14/home_collection_1_banner.jpg?v=307"
-                      alt="series cover for Vinland Saga from kodansha"
-                    />
-                  </picture>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className={styles["product-information"]}>
-            <div style={{ height: "50px", maxHeight: "44px" }}>
-              {item.figure?.name}
-            </div>
-            <div style={{ fontWeight: "500" }}>$30.00</div>
-            <div className={styles["view"]}>
-              <span>View now</span>
-            </div>
-          </div>
-        </a>
-      </div>
-    </div>
-  );
-};
+import Carousel from "@/components/carousel"
+import { products, sixteen } from "@/test/products";
 
 export default function Home() {
-  // position === active_index
-  const [position, setPosition] = useState(0);
-
-  const setPrev = () => {
-    setPosition(position - 1 < 0 ? length - 1 : position - 1);
-  };
-
-  const setNext = () => {
-    setPosition(position + 1 < length ? position + 1 : 0);
-  };
-
   return (
     <main className={styles.home}>
       <NavigationBar />
@@ -222,43 +33,34 @@ export default function Home() {
         </div>
       </header>
 
-      <section className={styles["section-1"]}>
-        <div className={styles["section-wrapper"]}>
-          <div className={styles["inner-section-wrapper"]}>
-            <div className={styles["content"]}>
-              <div className={styles["content-wrapper"]}>
-                <div className={styles["content-header"]}>
-                  <div className={styles["content-title"]}>
-                    <h2>THIS WEEK&apos;S NEW FIGURE RELEASES</h2>
-                    <h1>Check out our latest and greatest</h1>
-                  </div>
-                  <div className={styles["content-marker"]}>
-                    <div className={styles["inner-content-marker"]}>
-                      <div style={{ backgroundColor: "black" }}></div>
-                      <div></div>
-                    </div>
-                  </div>
-                </div>
-                <div className={styles["content-carousel"]}>
-                  <button onClick={() => setPrev()}>Prev</button>
+      <div style={{display: "flex", flexDirection: "column", width: "100%"}}>
+        <Carousel.Layout>
+          <Carousel.CarouselSlider products={products}>
+            <Carousel.CarouselHeader>
+              <h2>THIS WEEK&apos;S NEW FIGURE RELEASES</h2>
+              <h1>Check out our latest and greatest</h1>
+            </Carousel.CarouselHeader>
+          </Carousel.CarouselSlider>
+        </Carousel.Layout>
 
-                  <div className={styles["carousel"]}>
-                    {[...Array(length)].map((_, index) => (
-                      <CreateItemElement
-                        position={position}
-                        index={index}
-                        key={index}
-                      />
-                    ))}
-                  </div>
+        <Carousel.Layout>
+          <Carousel.CarouselSlider products={products}>
+            <Carousel.CarouselHeader>
+              <h2>THIS WEEK&apos;S NEW FIGURE RELEASES</h2>
+              <h1>Check out our latest and greatest</h1>
+            </Carousel.CarouselHeader>
+          </Carousel.CarouselSlider>
+        </Carousel.Layout>
 
-                  <button onClick={() => setNext()}>Next</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+        <Carousel.Layout>
+          <Carousel.CarouselSliderEndable products={sixteen}>
+            <Carousel.CarouselHeader>
+              <h2>THIS WEEK&apos;S NEW FIGURE RELEASES</h2>
+              <h1>Check out our latest and greatest</h1>
+            </Carousel.CarouselHeader>
+          </Carousel.CarouselSliderEndable>
+        </Carousel.Layout>
+      </div>
 
       <Footer />
     </main>

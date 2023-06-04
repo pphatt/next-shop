@@ -1,6 +1,7 @@
-import React from "react"
-import styles from "@/styles/components/navigation-bar.module.scss"
-import Link from "next/link"
+import React from "react";
+import styles from "@/styles/components/navigation-bar.module.scss";
+import Link from "next/link";
+import Button from "@/components/ui/button";
 
 const NavigationBar = () => {
   return (
@@ -27,17 +28,21 @@ const NavigationBar = () => {
           </ul>
           <div className={styles["btn-group"]}>
             <div className={styles["cart"]}>
-              <a className={styles.btn}>Cart</a>
+              <Button.Link inherit href={"/"} className={styles.btn}>
+                Cart
+              </Button.Link>
               <span>0</span>
             </div>
             <div style={{ marginLeft: "5px" }}>
-              <a className={styles.btn}>Menu</a>
+              <Button.Link inherit href={"/"} className={styles.btn}>
+                Menu
+              </Button.Link>
             </div>
           </div>
         </div>
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default NavigationBar
+export default NavigationBar;
