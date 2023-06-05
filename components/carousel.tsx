@@ -278,19 +278,19 @@ Carousel.CarouselSlider = function CarouselSlider({
             />
           ))}
         </div>
+      </div>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "center",
-          }}
-        >
-          <Button onClick={() => setPrev()}>Prev</Button>
-          <Button onClick={() => setNext()} style={{ marginLeft: "10px" }}>
-            Next
-          </Button>
-        </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          alignItems: "center",
+        }}
+      >
+        <Button onClick={() => setPrev()}>Prev</Button>
+        <Button onClick={() => setNext()} style={{ marginLeft: "10px" }}>
+          Next
+        </Button>
       </div>
     </>
   );

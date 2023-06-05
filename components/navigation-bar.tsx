@@ -8,13 +8,15 @@ const NavigationBar = () => {
     <nav className={styles["navigation-bar"]}>
       <div className={styles["inner-nav"]}>
         <div className={styles["logo"]}>
-          <a>⌘</a>
-          <span>Japan Figure</span>
+          <a href={"/"}>
+            <span>⌘</span>
+            <span style={{fontSize: "1.35rem", lineHeight: "1.5rem", fontWeight: "600"}}>Japan Figure</span>
+          </a>
         </div>
         <div className={styles["sub-nav"]}>
           <ul>
             <li>
-              <Link href={"/browser"}>Browser</Link>
+              <Link href={"/shop"}>Browser</Link>
             </li>
             <li>
               <Link href={"/news"}>News</Link>
@@ -35,7 +37,7 @@ const NavigationBar = () => {
             </div>
             <div style={{ marginLeft: "5px" }}>
               <Button.Link inherit href={"/"} className={styles.btn}>
-                Menu
+                Sign in
               </Button.Link>
             </div>
           </div>
