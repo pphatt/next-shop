@@ -90,13 +90,173 @@
   }
 }
 
+.filter-sort {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  height: auto;
+
+  background-color: #fff;
+
+  margin: 0 auto;
+
+  z-index: 10;
+
+  .filter-sort-title {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    //padding-top: 7px;
+
+    width: 100%;
+
+    font-size: 21px;
+    line-height: 25px;
+    font-weight: 600;
+  }
+}
+
+.filter-box {
+  display: flex;
+  flex-direction: row;
+
+  height: 40px;
+  width: 100%;
+
+  margin: 10px auto 0;
+
+  .filter-box-container {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    height: 40px;
+    min-height: 40px;
+    width: 100%;
+    max-width: unset;
+
+    cursor: pointer;
+
+    scroll-behavior: smooth;
+    scrollbar-color: #000 transparent;
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: black;
+      border-radius: 5px;
+    }
+  }
+}
+
+.filter-option-holder {
+  display: flex;
+  width: 100%;
+
+  span {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    border: 2px solid black;
+
+    width: 100%;
+    height: 100%;
+    min-height: 40px;
+
+    padding: 3px 15px 0;
+
+    font-size: 19px;
+    line-height: 28px;
+    font-weight: 500;
+    text-transform: uppercase;
+
+    user-select: none;
+  }
+
+  svg {
+    position: absolute;
+    right: 15px;
+    top: 16px;
+  }
+}
+
+.filter-options-dropdown {
+  position: absolute;
+  top: 40px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  height: auto;
+  max-height: 135px;
+  min-height: 40px;
+  width: 100%;
+
+  overflow-y: auto;
+
+  background-color: white;
+  border-left: 2px solid black;
+  border-bottom: 2px solid black;
+  border-right: 2px solid black;
+
+  z-index: 2;
+  list-style: none;
+
+  scroll-behavior: smooth;
+  scrollbar-color: #000 transparent;
+  scrollbar-width: thin;
+  user-select: none;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: black;
+    border-radius: 5px;
+  }
+
+  li {
+    width: 100%;
+    height: 35px;
+    min-height: 35px;
+
+    font-size: 15px;
+    line-height: 23px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    padding: 9px 15px 0 15px;
+
+    margin: auto;
+
+    &:hover {
+      background-color: #ddd;
+      cursor: pointer;
+    }
+  }
+}
+
 .filter-section {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: auto;
   align-items: center;
+
   margin-top: 20px;
+  //padding-top: 2px;
+  //border-top: 2px solid black;
 
   .title {
     color: #757575;
@@ -108,7 +268,15 @@
 
     margin-top: 30px;
     width: 100%;
+
+    //&:not(:first-child) {
+    //  margin-top: 30px;
+    //}
   }
+
+  /*&:not(:first-child) {
+    margin-top: 20px;
+  }*/
 }
 
 .filter-wrapper {
