@@ -15,7 +15,37 @@ import { useRouter } from "next/navigation";
 const Page = ({ searchParams }: { searchParams: {} }) => {
   const [filter, setFilter] = useState<string[]>([]);
 
-  const [currentSortOption, setCurrentSortOption] = useState("Name: A-Z")
+  const [currentPriceOption, setCurrentPriceOption] = useState<string[]>([]);
+  const [sortByPriceIsOpen, setSortByPriceIsOpen] = useState(false);
+  const sortPriceOptions: string[] = useMemo(
+    () => [
+      "Under 1.000.000₫",
+      "1.000.000₫ - 2.000.000₫",
+      "2.000.000₫ - 3.000.000₫",
+      "3.000.000₫ - 4.000.000₫",
+      "Above 4.000.000₫",
+    ],
+    []
+  );
+
+  const [currentScaleOption, setCurrentScaleOption] = useState<string[]>([]);
+  const [sortByScaleIsOpen, setSortByScaleIsOpen] = useState(false);
+  const sortScaleOptions: string[] = useMemo(
+    () => [
+      "1/12",
+      "1/10",
+      "1/8",
+      "1/7",
+      "1/6",
+      "1/5",
+      "1/4",
+      "1/3",
+      "none-scale",
+    ],
+    []
+  );
+
+  const [currentSortOption, setCurrentSortOption] = useState("Name: A-Z");
   const [sortIsOpen, setSortIsOpen] = useState<boolean>(false);
   const sortOptions = useMemo(
     () => [
@@ -32,6 +62,44 @@ const Page = ({ searchParams }: { searchParams: {} }) => {
   const router = useRouter();
   // console.log(filter);
   // router.push();
+
+  const handlePriceFilter = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (event.target.checked) {
+        setCurrentPriceOption([...currentPriceOption, event.target.id]);
+      } else {
+        const tempFilter = [];
+
+        for (let i = 0; i < currentPriceOption.length; i++) {
+          if (event.target.id !== currentPriceOption[i]) {
+            tempFilter.push(currentPriceOption[i]);
+          }
+        }
+
+        setCurrentPriceOption(tempFilter);
+      }
+    },
+    [currentPriceOption]
+  );
+
+  const handleScaleFilter = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (event.target.checked) {
+        setCurrentScaleOption([...currentScaleOption, event.target.id]);
+      } else {
+        const tempFilter = [];
+
+        for (let i = 0; i < currentScaleOption.length; i++) {
+          if (event.target.id !== currentScaleOption[i]) {
+            tempFilter.push(currentScaleOption[i]);
+          }
+        }
+
+        setCurrentScaleOption(tempFilter);
+      }
+    },
+    [currentScaleOption]
+  );
 
   const handleFilter = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,11 +141,106 @@ const Page = ({ searchParams }: { searchParams: {} }) => {
         <NavigationBar />
 
         <div className={styles["browse-container"]}>
-          <header>Browse</header>
+          {/*<header>Browse</header>*/}
+          <div className={styles["sub-nav"]}>
+            <a href={"/"}>Figure</a>
+          </div>
+          <div className={styles["filter-price-and-scale"]}>
+            <div className={styles["filter-price-and-scale-wrapper"]}>
+              <div className={styles["filter-sort"]}>
+                <span className={styles["filter-sort-title"]}>
+                  Sort by Price:
+                </span>
+
+                <div
+                  className={styles["filter-box"]}
+                  onClick={() => setSortByPriceIsOpen(!sortByPriceIsOpen)}
+                >
+                  <div className={styles["filter-box-container"]}>
+                    <div className={styles["filter-option-holder"]}>
+                      <span>Price</span>
+                      <svg
+                        viewBox="0 0 10 7"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="15"
+                      >
+                        <path d="m0 .5 5 5 5-5H0Z"></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {sortByPriceIsOpen && (
+                  <div className={styles["filter-p-and-s-dropdown"]}>
+                    <ul className={styles["filter-p-and-s-dropdown-wrapper"]}>
+                      {sortPriceOptions.map((value, index) => (
+                        <li key={index}>
+                          <label htmlFor={value}>{value}</label>
+                          <input
+                            checked={currentPriceOption.includes(value)}
+                            id={value}
+                            name={value}
+                            type={"checkbox"}
+                            onChange={(event) => handlePriceFilter(event)}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              <div className={styles["filter-sort"]}>
+                <span className={styles["filter-sort-title"]}>
+                  Sort by Scale:
+                </span>
+
+                <div
+                  className={styles["filter-box"]}
+                  onClick={() => setSortByScaleIsOpen(!sortByScaleIsOpen)}
+                >
+                  <div className={styles["filter-box-container"]}>
+                    <div className={styles["filter-option-holder"]}>
+                      <span>Scale</span>
+                      <svg
+                        viewBox="0 0 10 7"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="15"
+                      >
+                        <path d="m0 .5 5 5 5-5H0Z"></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {sortByScaleIsOpen && (
+                  <div className={styles["filter-p-and-s-dropdown"]}>
+                    <ul className={styles["filter-p-and-s-dropdown-wrapper"]}>
+                      {sortScaleOptions.map((value, index) => (
+                        <li key={index}>
+                          <label htmlFor={value}>{value}</label>
+                          <input
+                            checked={currentScaleOption.includes(value)}
+                            id={value}
+                            name={value}
+                            type={"checkbox"}
+                            onChange={(event) => handleScaleFilter(event)}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
           <div className={styles["list-figure-wrapper"]}>
             <div className={styles["filter"]}>
               <div className={styles["filter-sort"]}>
-                <span className={styles["filter-sort-title"]}>Sort by:</span>
+                <span className={styles["filter-sort-title"]}>
+                  Sort by:
+                </span>
                 <div
                   className={styles["filter-box"]}
                   onClick={() => setSortIsOpen(!sortIsOpen)}
@@ -97,10 +260,15 @@ const Page = ({ searchParams }: { searchParams: {} }) => {
                     {sortIsOpen && (
                       <ul className={styles["filter-options-dropdown"]}>
                         {sortOptions.map((value, index) => (
-                          <li key={index} onClick={() => {
-                            setCurrentSortOption(value)
-                            setSortIsOpen(false)
-                          }}>{value}</li>
+                          <li
+                            key={index}
+                            onClick={() => {
+                              setCurrentSortOption(value);
+                              setSortIsOpen(false);
+                            }}
+                          >
+                            {value}
+                          </li>
                         ))}
                       </ul>
                     )}
@@ -109,7 +277,7 @@ const Page = ({ searchParams }: { searchParams: {} }) => {
               </div>
 
               <div className={styles["filter-section"]}>
-                <div className={styles["title"]}>Company</div>
+                <div className={styles["title"]}>Manufacturer</div>
                 <ul className={styles["filter-wrapper"]}>
                   {company.map((value, index) => (
                     <li key={index}>
@@ -121,18 +289,6 @@ const Page = ({ searchParams }: { searchParams: {} }) => {
                         type={"checkbox"}
                         onChange={(e) => handleFilter(e)}
                       />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className={styles["filter-section"]}>
-                <div className={styles["title"]}>Company</div>
-                <ul className={styles["filter-wrapper"]}>
-                  {company.map((value, index) => (
-                    <li key={index}>
-                      <label htmlFor={value}>{value}</label>
-                      <input id={value} name={value} type={"checkbox"} />
                     </li>
                   ))}
                 </ul>
