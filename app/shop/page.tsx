@@ -171,22 +171,28 @@ const Page = ({ searchParams }: { searchParams: {} }) => {
                 </div>
 
                 {sortByPriceIsOpen && (
-                  <div className={styles["filter-p-and-s-dropdown"]}>
-                    <ul className={styles["filter-p-and-s-dropdown-wrapper"]}>
-                      {sortPriceOptions.map((value, index) => (
-                        <li key={index}>
-                          <label htmlFor={value}>{value}</label>
-                          <input
-                            checked={currentPriceOption.includes(value)}
-                            id={value}
-                            name={value}
-                            type={"checkbox"}
-                            onChange={(event) => handlePriceFilter(event)}
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  <>
+                    <div
+                      className={styles["back-drop"]}
+                      onClick={() => setSortByPriceIsOpen(false)}
+                    ></div>
+                    <div className={styles["filter-p-and-s-dropdown"]}>
+                      <ul className={styles["filter-p-and-s-dropdown-wrapper"]}>
+                        {sortPriceOptions.map((value, index) => (
+                          <li key={index}>
+                            <label htmlFor={value}>{value}</label>
+                            <input
+                              checked={currentPriceOption.includes(value)}
+                              id={value}
+                              name={value}
+                              type={"checkbox"}
+                              onChange={(event) => handlePriceFilter(event)}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
                 )}
               </div>
 
@@ -214,22 +220,28 @@ const Page = ({ searchParams }: { searchParams: {} }) => {
                 </div>
 
                 {sortByScaleIsOpen && (
-                  <div className={styles["filter-p-and-s-dropdown"]}>
-                    <ul className={styles["filter-p-and-s-dropdown-wrapper"]}>
-                      {sortScaleOptions.map((value, index) => (
-                        <li key={index}>
-                          <label htmlFor={value}>{value}</label>
-                          <input
-                            checked={currentScaleOption.includes(value)}
-                            id={value}
-                            name={value}
-                            type={"checkbox"}
-                            onChange={(event) => handleScaleFilter(event)}
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  <>
+                    <div
+                      className={styles["back-drop"]}
+                      onClick={() => setSortByScaleIsOpen(false)}
+                    ></div>
+                    <div className={styles["filter-p-and-s-dropdown"]}>
+                      <ul className={styles["filter-p-and-s-dropdown-wrapper"]}>
+                        {sortScaleOptions.map((value, index) => (
+                          <li key={index}>
+                            <label htmlFor={value}>{value}</label>
+                            <input
+                              checked={currentScaleOption.includes(value)}
+                              id={value}
+                              name={value}
+                              type={"checkbox"}
+                              onChange={(event) => handleScaleFilter(event)}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
                 )}
               </div>
             </div>
@@ -238,12 +250,11 @@ const Page = ({ searchParams }: { searchParams: {} }) => {
           <div className={styles["list-figure-wrapper"]}>
             <div className={styles["filter"]}>
               <div className={styles["filter-sort"]}>
-                <span className={styles["filter-sort-title"]}>
-                  Sort by:
-                </span>
+                <span className={styles["filter-sort-title"]}>Sort by:</span>
                 <div
                   className={styles["filter-box"]}
                   onClick={() => setSortIsOpen(!sortIsOpen)}
+                  style={{ zIndex: "51" }}
                 >
                   <div className={styles["filter-box-container"]}>
                     <div className={styles["filter-option-holder"]}>
@@ -258,19 +269,28 @@ const Page = ({ searchParams }: { searchParams: {} }) => {
                     </div>
 
                     {sortIsOpen && (
-                      <ul className={styles["filter-options-dropdown"]}>
-                        {sortOptions.map((value, index) => (
-                          <li
-                            key={index}
-                            onClick={() => {
-                              setCurrentSortOption(value);
-                              setSortIsOpen(false);
-                            }}
-                          >
-                            {value}
-                          </li>
-                        ))}
-                      </ul>
+                      <>
+                        <div
+                          className={styles["back-drop"]}
+                          onClick={() => setSortIsOpen(false)}
+                        ></div>
+                        <ul
+                          className={styles["filter-options-dropdown"]}
+                          style={{ zIndex: "51" }}
+                        >
+                          {sortOptions.map((value, index) => (
+                            <li
+                              key={index}
+                              onClick={() => {
+                                setCurrentSortOption(value);
+                                setSortIsOpen(false);
+                              }}
+                            >
+                              {value}
+                            </li>
+                          ))}
+                        </ul>
+                      </>
                     )}
                   </div>
                 </div>

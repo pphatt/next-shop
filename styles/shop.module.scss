@@ -96,7 +96,7 @@
   border-bottom: 2px solid black;
   border-right: 2px solid black;
 
-  z-index: 2;
+  z-index: 51;
   list-style: none;
 
   scroll-behavior: smooth;
@@ -204,6 +204,15 @@
   grid-column-gap: 30px;
 }
 
+.back-drop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  z-index: 50;
+}
+
 .filter {
   position: sticky;
   top: 15vh;
@@ -282,6 +291,8 @@
   width: 100%;
 
   margin: 10px auto 0;
+
+  z-index: 51;
 
   .filter-box-container {
     position: relative;
