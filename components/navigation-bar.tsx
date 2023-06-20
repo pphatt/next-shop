@@ -8,10 +8,10 @@ const NavigationBar = () => {
     <nav className={styles["navigation-bar"]}>
       <div className={styles["inner-nav"]}>
         <div className={styles["logo"]}>
-          <a href={"/"}>
+          <Link href={"/"}>
             <span>⌘</span>
             <span style={{fontSize: "1.35rem", lineHeight: "1.5rem", fontWeight: "600"}}>Japan Figure</span>
-          </a>
+          </Link>
         </div>
         <div className={styles["sub-nav"]}>
           <ul>
