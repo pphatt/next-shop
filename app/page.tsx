@@ -211,7 +211,7 @@ export default function Home() {
       </header>
 
       <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
-        {data?.length && (
+        {isLoading && (
           <Carousel.Skeleton
             length={4}
             line_1={"THIS WEEK&apos;S NEW FIGURE RELEASES"}
@@ -219,13 +219,13 @@ export default function Home() {
           />
         )}
 
-        {/*{data?.length && (*/}
-        {/*  <Carousel.Layout*/}
-        {/*    products={parserImageBlob}*/}
-        {/*    line_1={"THIS WEEK&apos;S NEW FIGURE RELEASES"}*/}
-        {/*    line_2={"Check out our latest and greatest"}*/}
-        {/*  />*/}
-        {/*)}*/}
+        {data?.length && (
+          <Carousel.Layout
+            products={parserImageBlob}
+            line_1={"THIS WEEK&apos;S NEW FIGURE RELEASES"}
+            line_2={"Check out our latest and greatest"}
+          />
+        )}
       </div>
 
       <Footer />

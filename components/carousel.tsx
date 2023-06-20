@@ -2,14 +2,15 @@ import React, { useState } from "react";
 import styles from "@/styles/components/carousel.module.scss";
 import Button from "@/components/ui/button";
 import Image from "next/image";
-import { computeTranslation } from "@/lib/helper"
-import Skeleton from "@/components/ui/skeleton"
+import { computeTranslation } from "@/lib/helper";
+import Skeleton from "@/components/ui/skeleton";
 
 export default function Carousel() {
   return <></>;
 }
 
-interface CarouselProductCardProps extends React.HTMLAttributes<HTMLDivElement>{
+interface CarouselProductCardProps
+  extends React.HTMLAttributes<HTMLDivElement> {
   product: { productName: string; image: string; price: string };
   length: number;
   position: number;
@@ -52,7 +53,7 @@ Carousel.ProductCard = function CarouselProductCard({
             <div style={{ height: "50px", maxHeight: "44px" }}>
               {product.productName}
             </div>
-            <div style={{ fontWeight: "500" }}>{product.price}</div>
+            <div style={{ fontWeight: "500" }}>${product.price}</div>
             <div className={styles["view"]}>
               <span>View now</span>
             </div>
@@ -150,6 +151,121 @@ Carousel.Layout = function CarouselLayout({
   );
 };
 
+interface CarouselSliderEndableProps
+  extends React.HTMLAttributes<HTMLDivElement> {
+  products: { productName: string; image: string; price: string }[];
+}
+
+Carousel.CarouselSliderEndable = function CarouselSliderEndable({
+  products,
+  children,
+}: CarouselSliderEndableProps) {
+  const [position, setPosition] = useState(0);
+  const length = products.length / 4;
+
+  const setPrev = () => {
+    if (position - 1 === -1) {
+      return;
+    }
+
+    setPosition(position - 1);
+  };
+
+  const setNext = () => {
+    if (position + 1 === length) {
+      return;
+    }
+
+    setPosition(position + 1);
+  };
+
+  return (
+    <>
+      <div className={styles["content-header"]}>
+        {children}
+
+        <div className={styles["content-marker"]}>
+          <div className={styles["inner-content-marker"]}>
+            {[...Array(products.length / 4)].map((_, index) => (
+              <div
+                key={index}
+                onClick={() => {
+                  setPosition(index);
+                }}
+                style={position === index ? { backgroundColor: "black" } : {}}
+              ></div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className={styles["content-carousel"]}>
+        <div
+          className={styles["carousel"]}
+          style={{
+            transform: `translateX(${-position * 1415}px)`,
+            transitionDuration: "300ms",
+          }}
+        >
+          {products.map((product, index) => (
+            <div
+              key={index}
+              className={styles["product"]}
+              style={{ position: "relative" }}
+            >
+              <div className={styles["product-wrapper"]}>
+                <a href={"/"}>
+                  <div className={styles["product-image"]}>
+                    <div className={styles["product-image-wrapper"]}>
+                      <div className={styles["inner-wrapper"]}>
+                        <div className={styles["container-wrapper"]}>
+                          <picture>
+                            <source
+                              media={"(min-width:768px)"}
+                              srcSet={product.image}
+                            />
+                            <img
+                              src="https://theme.hstatic.net/1000160337/1000885200/14/home_collection_1_banner.jpg?v=307"
+                              alt="series cover for Vinland Saga from kodansha"
+                            />
+                          </picture>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className={styles["product-information"]}>
+                    <div style={{ height: "50px", maxHeight: "44px" }}>
+                      {product.productName}
+                    </div>
+                    <div style={{ fontWeight: "500" }}>${product.price}</div>
+                    <div className={styles["view"]}>
+                      <span>View now</span>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
+          }}
+        >
+          <Button onClick={() => setPrev()}>Prev</Button>
+
+          <Button onClick={() => setNext()} style={{ marginLeft: "10px" }}>
+            Next
+          </Button>
+        </div>
+      </div>
+    </>
+  );
+};
+
 interface CarouselSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   length: number;
   line_1: string;
@@ -191,16 +307,6 @@ Carousel.Skeleton = function CarouselSkeleton({
                   >
                     <div className={styles["product-wrapper"]}>
                       <a href={"/"}>
-                        {/*<div className={styles["product-image"]}>*/}
-                        {/*  <div className={styles["product-image-wrapper"]}>*/}
-                        {/*    <div className={styles["inner-wrapper"]}>*/}
-                        {/*      <div className={styles["container-wrapper"]}>*/}
-                        {/*        <div></div>*/}
-                        {/*      </div>*/}
-                        {/*    </div>*/}
-                        {/*  </div>*/}
-                        {/*</div>*/}
-
                         <Skeleton width={338.75} height={474.45} />
 
                         <div className={styles["product-information"]}>
@@ -208,23 +314,11 @@ Carousel.Skeleton = function CarouselSkeleton({
 
                           <Skeleton width={338.75} height={0} />
 
-                          <Skeleton width={338.75} height={50} style={{marginTop: "5px"}} />
-
-                          {/*<div*/}
-                          {/*  style={{ height: "50px", maxHeight: "44px" }}*/}
-                          {/*  className={styles["product-on-loading"]}*/}
-                          {/*></div>*/}
-                          {/*<div*/}
-                          {/*  style={{ fontWeight: "500" }}*/}
-                          {/*  className={styles["product-on-loading"]}*/}
-                          {/*></div>*/}
-                          {/*<div*/}
-                          {/*  className={*/}
-                          {/*    styles["view"] +*/}
-                          {/*    " " +*/}
-                          {/*    styles["product-on-loading"]*/}
-                          {/*  }*/}
-                          {/*></div>*/}
+                          <Skeleton
+                            width={338.75}
+                            height={50}
+                            style={{ marginTop: "5px" }}
+                          />
                         </div>
                       </a>
                     </div>
@@ -257,108 +351,3 @@ Carousel.Skeleton = function CarouselSkeleton({
     </section>
   );
 };
-
-// interface CarouselSliderEndableProps
-//   extends React.HTMLAttributes<HTMLDivElement> {
-//   products: { figure: { name: string; image: string } }[];
-// }
-//
-// Carousel.CarouselSliderEndable = function CarouselSliderEndable({
-//   products,
-//   children,
-// }: CarouselSliderEndableProps) {
-//   const [position, setPosition] = useState(0);
-//   const length = products.length / 4;
-//
-//   const setPrev = () => {
-//     if (position - 1 === -1) {
-//       return
-//     }
-//
-//     setPosition(position - 1);
-//   };
-//
-//   const setNext = () => {
-//     if (position + 1 === length) {
-//       return
-//     }
-//
-//     setPosition(position + 1);
-//   };
-//
-//   return (
-//     <>
-//       <div className={styles["content-header"]}>
-//         {children}
-//
-//         <div className={styles["content-marker"]}>
-//           <div className={styles["inner-content-marker"]}>
-//             {[...Array(products.length / 4)].map((_, index) => (
-//               <div
-//                 key={index}
-//                 onClick={() => {
-//                   setPosition(index);
-//                 }}
-//                 style={position === index ? { backgroundColor: "black" } : {}}
-//               ></div>
-//             ))}
-//           </div>
-//         </div>
-//       </div>
-//
-//       <div className={styles["content-carousel"]}>
-//         <div className={styles["carousel"]} style={{transform: `translateX(${-position * 1415}px)`, transitionDuration: "300ms"}}>
-//           {products.map((product, index) => (
-//             <div key={index} className={styles["product"]} style={{position: "relative"}}>
-//               <div className={styles["product-wrapper"]}>
-//                 <a href={"/"}>
-//                   <div className={styles["product-image"]}>
-//                     <div className={styles["product-image-wrapper"]}>
-//                       <div className={styles["inner-wrapper"]}>
-//                         <div className={styles["container-wrapper"]}>
-//                           <picture>
-//                             <source
-//                               media={"(min-width:768px)"}
-//                               srcSet={product.figure.image}
-//                             />
-//                             <img
-//                               src="https://theme.hstatic.net/1000160337/1000885200/14/home_collection_1_banner.jpg?v=307"
-//                               alt="series cover for Vinland Saga from kodansha"
-//                             />
-//                           </picture>
-//                         </div>
-//                       </div>
-//                     </div>
-//                   </div>
-//                   <div className={styles["product-information"]}>
-//                     <div style={{ height: "50px", maxHeight: "44px" }}>
-//                       {product.figure.name}
-//                     </div>
-//                     <div style={{ fontWeight: "500" }}>$30.00</div>
-//                     <div className={styles["view"]}>
-//                       <span>View now</span>
-//                     </div>
-//                   </div>
-//                 </a>
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//
-//         <div
-//           style={{
-//             display: "flex",
-//             justifyContent: "flex-end",
-//             alignItems: "center",
-//           }}
-//         >
-//           <Button onClick={() => setPrev()}>Prev</Button>
-//
-//           <Button onClick={() => setNext()} style={{ marginLeft: "10px" }}>
-//             Next
-//           </Button>
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
