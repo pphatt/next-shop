@@ -8,15 +8,39 @@ import React, {
 } from "react";
 import styles from "@/styles/shop.module.scss";
 import NavigationBar from "@/components/navigation-bar";
-import { sixteen } from "@/test/products";
 import Footer from "@/components/footer";
-import { useRouter } from "next/navigation";
+import ProductCard from "@/components/card";
+import useSWR from "swr";
+import { b64toBlob } from "@/lib/helper";
+import Skeleton from "@/components/ui/skeleton";
+import { IProduct } from "@/type/IProduct";
+import { DropdownMenu } from "@/components/ui/dropdown";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
-const Page = ({ searchParams }: { searchParams: {} }) => {
+// urlQuery = "http://localhost:3000/shop?page=1&manufacture=1,2,3,4,5&price=1,2,3,4,5&scale=1,2,3,4,5"
+
+const Page = ({
+  searchParams,
+}: {
+  searchParams: { page: string; manufacture: string; p: string; scale: string };
+}) => {
+  // const parserQuery = searchParams
+
+  //@ts-ignore
+  const fetcher = (...args) => fetch(...args).then((res) => res.json());
+  const { data, error, isLoading } = useSWR(
+    `http://localhost:8000/products?manufacture=${searchParams.manufacture}`,
+    fetcher,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  );
+
   const [filter, setFilter] = useState<string[]>([]);
 
-  const [currentPriceOption, setCurrentPriceOption] = useState<string[]>([]);
-  const [sortByPriceIsOpen, setSortByPriceIsOpen] = useState(false);
+  const [currentPriceOptions, setCurrentPriceOptions] = useState<string[]>([]);
   const sortPriceOptions: string[] = useMemo(
     () => [
       "Under 1.000.000₫",
@@ -28,8 +52,7 @@ const Page = ({ searchParams }: { searchParams: {} }) => {
     []
   );
 
-  const [currentScaleOption, setCurrentScaleOption] = useState<string[]>([]);
-  const [sortByScaleIsOpen, setSortByScaleIsOpen] = useState(false);
+  const [currentScaleOptions, setCurrentScaleOptions] = useState<string[]>([]);
   const sortScaleOptions: string[] = useMemo(
     () => [
       "1/12",
@@ -60,46 +83,6 @@ const Page = ({ searchParams }: { searchParams: {} }) => {
   );
 
   const router = useRouter();
-  // console.log(filter);
-  // router.push();
-
-  const handlePriceFilter = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (event.target.checked) {
-        setCurrentPriceOption([...currentPriceOption, event.target.id]);
-      } else {
-        const tempFilter = [];
-
-        for (let i = 0; i < currentPriceOption.length; i++) {
-          if (event.target.id !== currentPriceOption[i]) {
-            tempFilter.push(currentPriceOption[i]);
-          }
-        }
-
-        setCurrentPriceOption(tempFilter);
-      }
-    },
-    [currentPriceOption]
-  );
-
-  const handleScaleFilter = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (event.target.checked) {
-        setCurrentScaleOption([...currentScaleOption, event.target.id]);
-      } else {
-        const tempFilter = [];
-
-        for (let i = 0; i < currentScaleOption.length; i++) {
-          if (event.target.id !== currentScaleOption[i]) {
-            tempFilter.push(currentScaleOption[i]);
-          }
-        }
-
-        setCurrentScaleOption(tempFilter);
-      }
-    },
-    [currentScaleOption]
-  );
 
   const handleFilter = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,9 +103,14 @@ const Page = ({ searchParams }: { searchParams: {} }) => {
     [filter]
   );
 
-  // useEffect(() => {
-  //   // const filterQuery = ""
-  // }, [filter])
+  // console.log("Filter:")
+  // console.log(filter)
+  //
+  // console.log("Price:")
+  // console.log(currentPriceOptions)
+  //
+  // console.log("Scale:")
+  // console.log(currentScaleOptions)
 
   const company = [
     "Good Smile Company",
@@ -135,115 +123,88 @@ const Page = ({ searchParams }: { searchParams: {} }) => {
     "Kadokawa",
   ];
 
+  const parserImageBlob: IProduct[] = useMemo(() => {
+    return data?.map((value: IProduct) => {
+      const blob = b64toBlob(value.image, "image/png");
+      const blobURL = URL.createObjectURL(blob);
+      console.log(blobURL);
+
+      return {
+        ...value,
+        image: blobURL,
+        hoverImage: blobURL,
+      };
+    });
+  }, [data]);
+
+  const { push, replace } = useRouter();
+  const pathName = usePathname();
+  // const basedQuery = useSearchParams()
+  // console.log(searchParams)
+  // let query = ""
+
+  // TODO: add query search for both frontend and backend
+
+  // const buttonHandler = () => push(`${pathName}?`);
+
+  useEffect(() => {
+    let manufacture: number[] = [];
+
+    for (let i = 0; i < filter.length; i++) {
+      let index = company.indexOf(filter[i])
+
+      if (index !== -1) {
+        manufacture.push(index + 1)
+      }
+    }
+
+    console.log(manufacture)
+
+    let queryManufacture = "manufacture=" + manufacture.join(",")
+
+    push(`${pathName}?${queryManufacture}`);
+  }, [filter, currentPriceOptions, currentScaleOptions])
+
+  // const queryReplacer = useCallback(() => {
+  //   let manufacture: string[] = [];
+  //
+  //   for (let i = 0; i < filter.length; i++) {
+  //     let intToString = parseInt(filter[i])
+  //
+  //     if (0 < intToString && intToString <= company.length) {
+  //       manufacture.push(filter[i])
+  //     }
+  //   }
+  //
+  //   let queryManufacture = "manufacture=" + manufacture.join(",")
+  //
+  //   push(`${pathName}?${queryManufacture}`);
+  // }, [filter, currentPriceOptions, currentScaleOptions]);
+
   return (
     <>
       <div className={styles.home}>
         <NavigationBar />
 
         <div className={styles["browse-container"]}>
-          {/*<header>Browse</header>*/}
           <div className={styles["sub-nav"]}>
             <a href={"/"}>Figure</a>
           </div>
           <div className={styles["filter-price-and-scale"]}>
             <div className={styles["filter-price-and-scale-wrapper"]}>
-              <div className={styles["filter-sort"]}>
-                <span className={styles["filter-sort-title"]}>
-                  Sort by Price:
-                </span>
+              <DropdownMenu
+                context={"Price"}
+                options={sortPriceOptions}
+                checked={currentPriceOptions}
+                onCheckedChange={setCurrentPriceOptions}
+              />
 
-                <div
-                  className={styles["filter-box"]}
-                  onClick={() => setSortByPriceIsOpen(!sortByPriceIsOpen)}
-                >
-                  <div className={styles["filter-box-container"]}>
-                    <div className={styles["filter-option-holder"]}>
-                      <span>Price</span>
-                      <svg
-                        viewBox="0 0 10 7"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="15"
-                      >
-                        <path d="m0 .5 5 5 5-5H0Z"></path>
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-
-                {sortByPriceIsOpen && (
-                  <>
-                    <div
-                      className={styles["back-drop"]}
-                      onClick={() => setSortByPriceIsOpen(false)}
-                    ></div>
-                    <div className={styles["filter-p-and-s-dropdown"]}>
-                      <ul className={styles["filter-p-and-s-dropdown-wrapper"]}>
-                        {sortPriceOptions.map((value, index) => (
-                          <li key={index}>
-                            <label htmlFor={value}>{value}</label>
-                            <input
-                              checked={currentPriceOption.includes(value)}
-                              id={value}
-                              name={value}
-                              type={"checkbox"}
-                              onChange={(event) => handlePriceFilter(event)}
-                            />
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </>
-                )}
-              </div>
-
-              <div className={styles["filter-sort"]}>
-                <span className={styles["filter-sort-title"]}>
-                  Sort by Scale:
-                </span>
-
-                <div
-                  className={styles["filter-box"]}
-                  onClick={() => setSortByScaleIsOpen(!sortByScaleIsOpen)}
-                >
-                  <div className={styles["filter-box-container"]}>
-                    <div className={styles["filter-option-holder"]}>
-                      <span>Scale</span>
-                      <svg
-                        viewBox="0 0 10 7"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="15"
-                      >
-                        <path d="m0 .5 5 5 5-5H0Z"></path>
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-
-                {sortByScaleIsOpen && (
-                  <>
-                    <div
-                      className={styles["back-drop"]}
-                      onClick={() => setSortByScaleIsOpen(false)}
-                    ></div>
-                    <div className={styles["filter-p-and-s-dropdown"]}>
-                      <ul className={styles["filter-p-and-s-dropdown-wrapper"]}>
-                        {sortScaleOptions.map((value, index) => (
-                          <li key={index}>
-                            <label htmlFor={value}>{value}</label>
-                            <input
-                              checked={currentScaleOption.includes(value)}
-                              id={value}
-                              name={value}
-                              type={"checkbox"}
-                              onChange={(event) => handleScaleFilter(event)}
-                            />
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </>
-                )}
-              </div>
+              <DropdownMenu
+                context={"Scale"}
+                options={sortScaleOptions}
+                checked={currentScaleOptions}
+                onCheckedChange={setCurrentScaleOptions}
+              />
             </div>
           </div>
 
@@ -318,76 +279,23 @@ const Page = ({ searchParams }: { searchParams: {} }) => {
               <span>Display 10 of 100 figures</span>
               <div className={styles["divider"]}></div>
               <div className={styles["figure-list-container"]}>
-                {sixteen.map((value, index) =>
-                  filter.length > 0 ? (
-                    filter.includes(value.figure.company) && (
-                      <a key={index} className={styles["figure"]} href={"/"}>
-                        <div className={styles["poster-wrapper"]}>
-                          <div className={styles["poster-container"]}>
-                            <div className={styles["inner-poster-container"]}>
-                              <div>
-                                <picture className={styles["figure-image"]}>
-                                  <source
-                                    media="(min-width:768px)"
-                                    srcSet={value.figure.image}
-                                  />
-                                  <img src={value.figure.image} alt="" />
-                                </picture>
-                                {value.figure.hover_image && (
-                                  <picture
-                                    className={styles["figure-image-hover"]}
-                                  >
-                                    <source
-                                      media="(min-width:768px)"
-                                      srcSet={value.figure.hover_image}
-                                    />
-                                    <img
-                                      src={value.figure.hover_image}
-                                      alt=""
-                                    />
-                                  </picture>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <span>{value.figure.name}</span>
-                        <span>6,250,000₫</span>
-                      </a>
-                    )
-                  ) : (
-                    <a key={index} className={styles["figure"]} href={"/"}>
-                      <div className={styles["poster-wrapper"]}>
-                        <div className={styles["poster-container"]}>
-                          <div className={styles["inner-poster-container"]}>
-                            <div>
-                              <picture className={styles["figure-image"]}>
-                                <source
-                                  media="(min-width:768px)"
-                                  srcSet={value.figure.image}
-                                />
-                                <img src={value.figure.image} alt="" />
-                              </picture>
-                              {value.figure.hover_image && (
-                                <picture
-                                  className={styles["figure-image-hover"]}
-                                >
-                                  <source
-                                    media="(min-width:768px)"
-                                    srcSet={value.figure.hover_image}
-                                  />
-                                  <img src={value.figure.hover_image} alt="" />
-                                </picture>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <span>{value.figure.name}</span>
-                      <span>6,250,000₫</span>
-                    </a>
-                  )
-                )}
+                {isLoading &&
+                  [...Array(8)].map((_, index) => (
+                    <Skeleton height={329} width={235} key={index}></Skeleton>
+                  ))}
+
+                {data?.length > 0 &&
+                  parserImageBlob.map(
+                    (
+                      value: {
+                        productName: string;
+                        price: string;
+                        image: string;
+                        hoverImage: string;
+                      },
+                      index: number
+                    ) => <ProductCard product={value} key={index} />
+                  )}
               </div>
               <div className={styles["divider"]}></div>
               <div className={styles["pages-container"]}>

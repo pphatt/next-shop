@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "@/styles/components/carousel.module.scss";
 import Button from "@/components/ui/button";
 import Image from "next/image";
@@ -70,21 +70,36 @@ interface CarouselLayoutProps extends React.HTMLAttributes<HTMLDivElement> {
   line_2: string;
 }
 
+const sleep = (ms = 0) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
 Carousel.Layout = function CarouselLayout({
   products,
   line_1,
   line_2,
 }: CarouselLayoutProps) {
+  const [isClick, setIsClick] = useState(false);
   const [position, setPosition] = useState(0);
   const length = products.length;
 
   const setPrev = () => {
-    setPosition(position - 1 < 0 ? length - 1 : position - 1);
+    if (!isClick) {
+      setIsClick(true);
+      setPosition(position - 1 < 0 ? length - 1 : position - 1);
+    }
   };
 
   const setNext = () => {
-    setPosition(position + 1 < length ? position + 1 : 0);
+    if (!isClick) {
+      setIsClick(true);
+      setPosition(position + 1 < length ? position + 1 : 0);
+    }
   };
+
+  useEffect(() => {
+    if (isClick) sleep(300).then(() => setIsClick(false));
+  }, [isClick]);
 
   return (
     <section className={styles["section"]}>
