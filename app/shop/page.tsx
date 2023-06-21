@@ -22,25 +22,26 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 const Page = ({
   searchParams,
 }: {
-  searchParams: { page: string; manufacture: string; p: string; scale: string };
+  searchParams: {
+    page: string;
+    manufacture: string;
+    price: string;
+    scale: string;
+  };
 }) => {
   // const parserQuery = searchParams
 
-  //@ts-ignore
-  const fetcher = (...args) => fetch(...args).then((res) => res.json());
-  const { data, error, isLoading } = useSWR(
-    `http://localhost:8000/products?manufacture=${searchParams.manufacture}`,
-    fetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
-  );
+  const company = [
+    "Good Smile Company",
+    "Kotobukiya",
+    "Max Factory",
+    "FREEing",
+    "MegaHouse",
+    "Bandai Spirit",
+    "Phat Company",
+    "Kadokawa",
+  ];
 
-  const [filter, setFilter] = useState<string[]>([]);
-
-  const [currentPriceOptions, setCurrentPriceOptions] = useState<string[]>([]);
   const sortPriceOptions: string[] = useMemo(
     () => [
       "Under 1.000.000₫",
@@ -52,7 +53,6 @@ const Page = ({
     []
   );
 
-  const [currentScaleOptions, setCurrentScaleOptions] = useState<string[]>([]);
   const sortScaleOptions: string[] = useMemo(
     () => [
       "1/12",
@@ -68,8 +68,6 @@ const Page = ({
     []
   );
 
-  const [currentSortOption, setCurrentSortOption] = useState("Name: A-Z");
-  const [sortIsOpen, setSortIsOpen] = useState<boolean>(false);
   const sortOptions = useMemo(
     () => [
       "Name: A-Z",
@@ -82,17 +80,181 @@ const Page = ({
     []
   );
 
+  const { push } = useRouter();
+  const pathName = usePathname();
+
+  const [filter, setFilter] = useState<number[]>([]);
+  const [currentPriceOptions, setCurrentPriceOptions] = useState<number[]>([]);
+  const [currentScaleOptions, setCurrentScaleOptions] = useState<number[]>([]);
+
+  const sanitizedQuery = useCallback((query: string[], length: number) => {
+    const returnedArray: number[] = [];
+
+    for (let i = 0; i < query.length; i++) {
+      let index = parseInt(query[i]);
+
+      if (0 < index && index <= length) {
+        returnedArray.push(index);
+      }
+    }
+
+    return returnedArray;
+  }, []);
+
+  const compareEqual = useCallback((arr_1: number[], arr_2: number[]) => {
+    if (arr_1.length !== arr_2.length) {
+      return false;
+    }
+
+    for (let i = 0; i < arr_1.length; i++) {
+      if (arr_1[i] !== arr_2[i]) {
+        return false;
+      }
+    }
+
+    return true;
+  }, []);
+
+  useEffect(() => {
+    let manufacture = "manufacture=";
+    let price = "price=";
+    let scale = "scale=";
+
+    const manufactureQuery = sanitizedQuery(
+      searchParams.manufacture.split(","),
+      company.length
+    ).sort((a, b) => a - b);
+
+    const compareManufacture = compareEqual(manufactureQuery, filter);
+
+    if (!compareManufacture) {
+      const arr = filter.sort((a, b) => a - b);
+
+      manufacture += arr.join(",");
+
+      setFilter(arr);
+    } else {
+      manufacture += manufactureQuery.join(",");
+    }
+
+    const priceQuery = sanitizedQuery(
+      searchParams.price.split(","),
+      company.length
+    ).sort((a, b) => a - b);
+
+    const comparePrice = compareEqual(priceQuery, filter);
+
+    if (!comparePrice) {
+      const arr = currentPriceOptions.sort((a, b) => a - b);
+
+      price += arr.join(",");
+
+      setFilter(arr);
+    } else {
+      price += priceQuery.join(",");
+    }
+
+    const scaleQuery = sanitizedQuery(
+      searchParams.scale.split(","),
+      company.length
+    ).sort((a, b) => a - b);
+
+    const compareScale = compareEqual(scaleQuery, filter);
+
+    if (!compareScale) {
+      const arr = currentScaleOptions.sort((a, b) => a - b);
+
+      scale += arr.join(",");
+
+      setFilter(arr);
+    } else {
+      price += scaleQuery.join(",");
+    }
+
+    push(`${pathName}?${manufacture}&${price}&${scale}`);
+  }, [filter, currentPriceOptions, currentScaleOptions]);
+
+  useEffect(() => {
+    let manufacture = "manufacture=";
+    let price = "price=";
+    let scale = "scale=";
+
+    if (searchParams.manufacture) {
+      const manufactureQuery = sanitizedQuery(
+        searchParams.manufacture.split(","),
+        company.length
+      ).sort((a, b) => a - b);
+
+      const manufactureArr = manufactureQuery.filter(
+        (value, index, array) => array.indexOf(value) === index
+      );
+
+      manufacture += manufactureArr.join(",");
+
+      setFilter(manufactureArr);
+    }
+
+    if (searchParams.price) {
+      const priceQuery = sanitizedQuery(
+        searchParams.price.split(","),
+        company.length
+      ).sort((a, b) => a - b);
+
+      const priceArr = priceQuery.filter(
+        (value, index, array) => array.indexOf(value) === index
+      );
+
+      price += priceArr.join(",");
+
+      setCurrentPriceOptions(priceArr);
+    }
+
+    if (searchParams.scale) {
+      const scaleQuery = sanitizedQuery(
+        searchParams.scale.split(","),
+        company.length
+      ).sort((a, b) => a - b);
+
+      const scaleArr = scaleQuery.filter(
+        (value, index, array) => array.indexOf(value) === index
+      );
+
+      manufacture += scaleArr.join(",");
+
+      setCurrentScaleOptions(scaleArr);
+    }
+
+    push(`${pathName}?${manufacture}&${price}&${scale}`);
+  }, []);
+
+  //@ts-ignore
+  const fetcher = (...args) => fetch(...args).then((res) => res.json());
+  const { data, error, isLoading } = useSWR(
+    `http://localhost:8000/products?manufacture=${searchParams.manufacture}`,
+    fetcher,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  );
+
+  const [currentSortOption, setCurrentSortOption] = useState("Name: A-Z");
+  const [sortIsOpen, setSortIsOpen] = useState<boolean>(false);
+
   const router = useRouter();
 
   const handleFilter = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
+      let int = parseInt(event.target.value);
+
       if (event.target.checked) {
-        setFilter([...filter, event.target.id]);
+        setFilter([...filter, int]);
       } else {
         const tempFilter = [];
 
         for (let i = 0; i < filter.length; i++) {
-          if (event.target.id !== filter[i]) {
+          if (int !== filter[i]) {
             tempFilter.push(filter[i]);
           }
         }
@@ -103,31 +265,11 @@ const Page = ({
     [filter]
   );
 
-  // console.log("Filter:")
-  // console.log(filter)
-  //
-  // console.log("Price:")
-  // console.log(currentPriceOptions)
-  //
-  // console.log("Scale:")
-  // console.log(currentScaleOptions)
-
-  const company = [
-    "Good Smile Company",
-    "Kotobukiya",
-    "Max Factory",
-    "FREEing",
-    "MegaHouse",
-    "Bandai Spirit",
-    "Phat Company",
-    "Kadokawa",
-  ];
-
   const parserImageBlob: IProduct[] = useMemo(() => {
     return data?.map((value: IProduct) => {
       const blob = b64toBlob(value.image, "image/png");
       const blobURL = URL.createObjectURL(blob);
-      console.log(blobURL);
+      // console.log(blobURL);
 
       return {
         ...value,
@@ -137,49 +279,7 @@ const Page = ({
     });
   }, [data]);
 
-  const { push, replace } = useRouter();
-  const pathName = usePathname();
-  // const basedQuery = useSearchParams()
-  // console.log(searchParams)
-  // let query = ""
-
   // TODO: add query search for both frontend and backend
-
-  // const buttonHandler = () => push(`${pathName}?`);
-
-  useEffect(() => {
-    let manufacture: number[] = [];
-
-    for (let i = 0; i < filter.length; i++) {
-      let index = company.indexOf(filter[i])
-
-      if (index !== -1) {
-        manufacture.push(index + 1)
-      }
-    }
-
-    console.log(manufacture)
-
-    let queryManufacture = "manufacture=" + manufacture.join(",")
-
-    push(`${pathName}?${queryManufacture}`);
-  }, [filter, currentPriceOptions, currentScaleOptions])
-
-  // const queryReplacer = useCallback(() => {
-  //   let manufacture: string[] = [];
-  //
-  //   for (let i = 0; i < filter.length; i++) {
-  //     let intToString = parseInt(filter[i])
-  //
-  //     if (0 < intToString && intToString <= company.length) {
-  //       manufacture.push(filter[i])
-  //     }
-  //   }
-  //
-  //   let queryManufacture = "manufacture=" + manufacture.join(",")
-  //
-  //   push(`${pathName}?${queryManufacture}`);
-  // }, [filter, currentPriceOptions, currentScaleOptions]);
 
   return (
     <>
@@ -264,8 +364,8 @@ const Page = ({
                     <li key={index}>
                       <label htmlFor={value}>{value}</label>
                       <input
-                        checked={filter.includes(value)}
-                        id={value}
+                        checked={filter.includes(index)}
+                        value={index}
                         name={value}
                         type={"checkbox"}
                         onChange={(e) => handleFilter(e)}

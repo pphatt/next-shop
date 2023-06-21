@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import styles from "@/styles/shop.module.scss";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 interface DropdownProps extends React.HTMLAttributes<HTMLDivElement> {
   options: string[];
   context: string;
-  checked: string[];
-  onCheckedChange: React.Dispatch<React.SetStateAction<string[]>>;
+  checked: number[];
+  onCheckedChange: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
 /*
@@ -63,23 +64,23 @@ export const DropdownMenu = ({
                   <label htmlFor={option}>{option}</label>
 
                   <input
-                    checked={checked.includes(option)}
+                    checked={checked.includes(index)}
                     id={option}
                     name={option}
                     type={"checkbox"}
                     onChange={(event) => {
-                      if (checked.includes(option)) {
+                      if (checked.includes(index)) {
                         let temp = [];
 
                         for (let i = 0; i < checked.length; i++) {
-                          if (checked[i] !== option) {
+                          if (checked[i] !== index) {
                             temp.push(checked[i]);
                           }
                         }
 
                         onCheckedChange(temp);
                       } else {
-                        onCheckedChange([...checked, option]);
+                        onCheckedChange([...checked, index]);
                       }
                     }}
                   />
