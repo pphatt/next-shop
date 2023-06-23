@@ -15,225 +15,26 @@ import { b64toBlob } from "@/lib/helper";
 import Skeleton from "@/components/ui/skeleton";
 import { IProduct } from "@/type/IProduct";
 import { DropdownMenu } from "@/components/ui/dropdown";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import Button from "@/components/ui/button";
+import { company, sortOptions, sortPriceOptions, sortScaleOptions } from "@/lib/filter-options";
 
-// urlQuery = "http://localhost:3000/shop?page=1&manufacture=1,2,3,4,5&price=1,2,3,4,5&scale=1,2,3,4,5"
-
-const Page = ({
-  searchParams,
-}: {
-  searchParams: {
-    page: string;
-    manufacture: string;
-    price: string;
-    scale: string;
-  };
-}) => {
-  // const parserQuery = searchParams
-
-  const company = [
-    "Good Smile Company",
-    "Kotobukiya",
-    "Max Factory",
-    "FREEing",
-    "MegaHouse",
-    "Bandai Spirit",
-    "Phat Company",
-    "Kadokawa",
-  ];
-
-  const sortPriceOptions: string[] = useMemo(
-    () => [
-      "Under 1.000.000₫",
-      "1.000.000₫ - 2.000.000₫",
-      "2.000.000₫ - 3.000.000₫",
-      "3.000.000₫ - 4.000.000₫",
-      "Above 4.000.000₫",
-    ],
-    []
-  );
-
-  const sortScaleOptions: string[] = useMemo(
-    () => [
-      "1/12",
-      "1/10",
-      "1/8",
-      "1/7",
-      "1/6",
-      "1/5",
-      "1/4",
-      "1/3",
-      "none-scale",
-    ],
-    []
-  );
-
-  const sortOptions = useMemo(
-    () => [
-      "Name: A-Z",
-      "Name: Z-A",
-      "Price: Decreased",
-      "Price: Increased",
-      "Newest",
-      "Oldest",
-    ],
-    []
-  );
-
-  const { push } = useRouter();
-  const pathName = usePathname();
-
+const Page = () => {
+  const [page, setPage] = useState<number>(1);
   const [filter, setFilter] = useState<number[]>([]);
   const [currentPriceOptions, setCurrentPriceOptions] = useState<number[]>([]);
   const [currentScaleOptions, setCurrentScaleOptions] = useState<number[]>([]);
 
-  const sanitizedQuery = useCallback((query: string[], length: number) => {
-    const returnedArray: number[] = [];
-
-    for (let i = 0; i < query.length; i++) {
-      let index = parseInt(query[i]);
-
-      if (0 < index && index <= length) {
-        returnedArray.push(index);
-      }
-    }
-
-    return returnedArray;
-  }, []);
-
-  const compareEqual = useCallback((arr_1: number[], arr_2: number[]) => {
-    if (arr_1.length !== arr_2.length) {
-      return false;
-    }
-
-    for (let i = 0; i < arr_1.length; i++) {
-      if (arr_1[i] !== arr_2[i]) {
-        return false;
-      }
-    }
-
-    return true;
-  }, []);
-
-  useEffect(() => {
-    let manufacture = "manufacture=";
-    let price = "price=";
-    let scale = "scale=";
-
-    const manufactureQuery = sanitizedQuery(
-      searchParams.manufacture.split(","),
-      company.length
-    ).sort((a, b) => a - b);
-
-    const compareManufacture = compareEqual(manufactureQuery, filter);
-
-    if (!compareManufacture) {
-      const arr = filter.sort((a, b) => a - b);
-
-      manufacture += arr.join(",");
-
-      setFilter(arr);
-    } else {
-      manufacture += manufactureQuery.join(",");
-    }
-
-    const priceQuery = sanitizedQuery(
-      searchParams.price.split(","),
-      company.length
-    ).sort((a, b) => a - b);
-
-    const comparePrice = compareEqual(priceQuery, filter);
-
-    if (!comparePrice) {
-      const arr = currentPriceOptions.sort((a, b) => a - b);
-
-      price += arr.join(",");
-
-      setFilter(arr);
-    } else {
-      price += priceQuery.join(",");
-    }
-
-    const scaleQuery = sanitizedQuery(
-      searchParams.scale.split(","),
-      company.length
-    ).sort((a, b) => a - b);
-
-    const compareScale = compareEqual(scaleQuery, filter);
-
-    if (!compareScale) {
-      const arr = currentScaleOptions.sort((a, b) => a - b);
-
-      scale += arr.join(",");
-
-      setFilter(arr);
-    } else {
-      price += scaleQuery.join(",");
-    }
-
-    push(`${pathName}?${manufacture}&${price}&${scale}`);
-  }, [filter, currentPriceOptions, currentScaleOptions]);
-
-  useEffect(() => {
-    let manufacture = "manufacture=";
-    let price = "price=";
-    let scale = "scale=";
-
-    if (searchParams.manufacture) {
-      const manufactureQuery = sanitizedQuery(
-        searchParams.manufacture.split(","),
-        company.length
-      ).sort((a, b) => a - b);
-
-      const manufactureArr = manufactureQuery.filter(
-        (value, index, array) => array.indexOf(value) === index
-      );
-
-      manufacture += manufactureArr.join(",");
-
-      setFilter(manufactureArr);
-    }
-
-    if (searchParams.price) {
-      const priceQuery = sanitizedQuery(
-        searchParams.price.split(","),
-        company.length
-      ).sort((a, b) => a - b);
-
-      const priceArr = priceQuery.filter(
-        (value, index, array) => array.indexOf(value) === index
-      );
-
-      price += priceArr.join(",");
-
-      setCurrentPriceOptions(priceArr);
-    }
-
-    if (searchParams.scale) {
-      const scaleQuery = sanitizedQuery(
-        searchParams.scale.split(","),
-        company.length
-      ).sort((a, b) => a - b);
-
-      const scaleArr = scaleQuery.filter(
-        (value, index, array) => array.indexOf(value) === index
-      );
-
-      manufacture += scaleArr.join(",");
-
-      setCurrentScaleOptions(scaleArr);
-    }
-
-    push(`${pathName}?${manufacture}&${price}&${scale}`);
-  }, []);
-
   //@ts-ignore
   const fetcher = (...args) => fetch(...args).then((res) => res.json());
   const { data, error, isLoading } = useSWR(
-    `http://localhost:8000/products?manufacture=${searchParams.manufacture}`,
+    `http://localhost:8000/products?page=${page}&manufacture=${filter.join(
+      ","
+    )}&price=${currentPriceOptions.join(",")}&scale=${currentScaleOptions.join(
+      ","
+    )}`,
     fetcher,
     {
-      revalidateIfStale: false,
+      // revalidateIfStale: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
     }
@@ -241,8 +42,6 @@ const Page = ({
 
   const [currentSortOption, setCurrentSortOption] = useState("Name: A-Z");
   const [sortIsOpen, setSortIsOpen] = useState<boolean>(false);
-
-  const router = useRouter();
 
   const handleFilter = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -376,12 +175,24 @@ const Page = ({
               </div>
             </div>
             <div className={styles["figure-list"]}>
-              <span>Display 10 of 100 figures</span>
+              <span>Display {page * 10} of 100 figures</span>
               <div className={styles["divider"]}></div>
               <div className={styles["figure-list-container"]}>
                 {isLoading &&
-                  [...Array(8)].map((_, index) => (
-                    <Skeleton height={329} width={235} key={index}></Skeleton>
+                  [...Array(10)].map((_, index) => (
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        gap: "10px",
+                      }}
+                      key={index}
+                    >
+                      <Skeleton height={329} width={235}></Skeleton>
+                      <Skeleton height={40} width={200} style={{marginTop: "5px"}}></Skeleton>
+                      <Skeleton height={40} width={100} style={{marginTop: "5px"}}></Skeleton>
+                    </div>
                   ))}
 
                 {data?.length > 0 &&
@@ -404,6 +215,8 @@ const Page = ({
               </div>
             </div>
           </div>
+
+          <Button onClick={() => setPage(page + 1)}>Show more</Button>
         </div>
       </div>
 

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import styles from "@/styles/shop.module.scss";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import styles from "@/styles/components/ui/dropdown.module.scss";
 
 interface DropdownProps extends React.HTMLAttributes<HTMLDivElement> {
   options: string[];

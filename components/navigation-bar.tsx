@@ -16,7 +16,7 @@ const NavigationBar = () => {
         <div className={styles["sub-nav"]}>
           <ul>
             <li>
-              <Link href={"/shop?manufacture=&price=&scale="}>Browser</Link>
+              <Link href={"/shop"}>Browser</Link>
             </li>
             <li>
               <Link href={"/news"}>News</Link>
