@@ -53,7 +53,7 @@ export const DropdownMenu = ({
       {isOpen && (
         <>
           <div
-            className={styles["back-drop"]}
+            className={styles["backdrop"]}
             onClick={() => setIsOpen(false)}
           ></div>
           <div className={styles["filter-p-and-s-dropdown"]}>

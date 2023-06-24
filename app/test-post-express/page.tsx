@@ -2,28 +2,10 @@
 import styles from "@/styles/index.module.scss";
 import NavigationBar from "@/components/navigation-bar";
 import Footer from "@/components/footer";
-import { ChangeEvent, use, useEffect, useState } from "react";
-
-async function getData() {
-  const res = await fetch("http://localhost:8000/products");
-  // The return value is *not* serialized
-  // You can return Date, Map, Set, etc.
-
-  // Recommendation: handle errors
-  if (!res.ok) {
-    // This will activate the closest `error.js` Error Boundary
-    throw new Error("Failed to fetch data");
-  }
-
-  return res.json();
-}
-
-// const query = getData();
+import { ChangeEvent, useState } from "react";
 
 export default function Home() {
   const [image, setImage] = useState<Buffer>();
-  // const data = use(query);
-  // console.log(data);
 
   const b64toBlob = (b64Data: string, contentType = "", sliceSize = 512) => {
     const byteCharacters = atob(b64Data);
@@ -44,15 +26,6 @@ export default function Home() {
     const blob = new Blob(byteArrays, { type: contentType });
     return blob;
   };
-
-  // useEffect(() => {
-  //   for (const key of data) {
-  //     const blob = b64toBlob(key.image, "image/png");
-  //     const blobUrl = URL.createObjectURL(blob);
-  //     console.log(key.productName)
-  //     console.log(blobUrl);
-  //   }
-  // }, []);
 
   /*
    * TODO -> actually to READ
@@ -94,7 +67,8 @@ export default function Home() {
   const upload = async (e: any) => {
     e.preventDefault();
 
-    const { name, price } = e.target;
+    const { name, price, manufacturer } = e.target;
+    // console.log(manufacturer.value)
 
     const data = await fetch("http://localhost:8000/products", {
       method: "POST",
@@ -143,8 +117,6 @@ export default function Home() {
       </header>
 
       <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
-        {/*<button onClick={() => upload()}>Save</button>*/}
-
         <form
           method={"POST"}
           onSubmit={(e) => upload(e)}
@@ -154,10 +126,14 @@ export default function Home() {
           <input
             type="text"
             name="price"
-            placeholder="Input name"
-            value={999}
-            readOnly
+            placeholder="Input price"
           />
+
+          <select name={"manufacturer"} required={true}>
+            <option value={"Good Smile Company"}>Good Smile Company</option>
+            <option value={"Kotobukiya"}>Kotobukiya</option>
+            <option value={"Max Factory"}>Max Factory</option>
+          </select>
 
           <input
             id="photo_1"
@@ -174,15 +150,6 @@ export default function Home() {
 
           <button type="submit">Save</button>
         </form>
-
-        {/*<div>*/}
-        {/*  {data.map((value, index) => (*/}
-        {/*    <div key={index}>*/}
-        {/*      <div>{value.productName}</div>*/}
-        {/*      <img src={value.image} />*/}
-        {/*    </div>*/}
-        {/*  ))}*/}
-        {/*</div>*/}
       </div>
 
       <Footer />
