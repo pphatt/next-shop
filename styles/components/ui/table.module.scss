@@ -1,0 +1,183 @@
+.table-layout {
+  margin-top: 1rem;
+  overflow: visible;
+
+  .outer-table-layout {
+    position: relative;
+    border-radius: 0.25rem;
+    overflow-x: auto;
+
+    .inner-table-layout {
+      display: inline-block;
+      vertical-align: middle;
+      min-width: 100%;
+    }
+  }
+}
+
+.table {
+  display: table;
+  width: 100%;
+
+  border-collapse: separate;
+  border-spacing: 0;
+  text-indent: 0;
+
+  border-color: inherit;
+
+  font-size: .875rem;
+  line-height: 1.25rem;
+
+  thead {
+    tr {
+      th {
+        color: hsl(240 5% 64.9%);
+
+        border-bottom-width: 1px;
+        border-bottom-color: hsl(240 3.7% 15.9%);
+
+        height: 3rem;
+
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        font-weight: 400;
+        text-align: left;
+        vertical-align: middle;
+
+        padding: 0 1rem;
+      }
+
+      transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+      transition-timing-function: cubic-bezier(.4, 0, .2, 1);
+      transition-duration: .15s;
+
+      &:hover {
+        background-color: hsl(240 3.7% 15.9% / .5)
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      position: relative;
+
+      border-bottom-width: 1px;
+      border-bottom-color: hsl(240 3.7% 15.9%);
+
+      td {
+        color: #fafafa;
+
+        padding: 1rem;
+
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+
+        vertical-align: middle;
+
+        .no-product-message {
+          display: flex;
+          align-items: center;
+          opacity: 0.75;
+
+          svg {
+            display: block;
+            vertical-align: middle;
+          }
+
+          p {
+            color: #7e7e7e;
+            margin-left: 12px;
+          }
+        }
+
+        span {
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          line-clamp: 1;
+          -webkit-box-orient: vertical;
+
+          color: #ededed;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          font-size: 0.875rem;
+          line-height: 1.25rem;
+
+          &.status {
+            margin: 0 0.2em;
+            padding: 0.2em 0.4em 0.1em;
+            background: hsla(0, 0%, 59%, 0.1);
+            border: 1px solid hsla(0, 0%, 39%, 0.2);
+            border-radius: 3px;
+            cursor: pointer;
+
+            &[data-status="0"] {
+              background-color: #40bf86;
+              border-color: #40bf86;
+            }
+
+            &[data-status="1"] {
+              color: #fbfcfd;
+              background-color: #e5484d;
+              border-color: #e5484d;
+            }
+          }
+        }
+      }
+
+      .view {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        color: #ededed;
+
+        button, a {
+          display: inline-flex;
+          align-items: center;
+
+          color: #ededed;
+          background-color: transparent;
+
+          text-align: center;
+
+          border: 0;
+          border-radius: 0.25rem;
+          padding: 5px;
+
+          font-size: 0.75rem;
+          line-height: 1rem;
+
+          cursor: pointer;
+
+          outline: 2px solid transparent;
+          outline-offset: 2px;
+
+          transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
+
+          box-shadow: 0 0 #000, 0 0 #000, 0 0 #000;
+
+          svg {
+            display: block;
+            vertical-align: middle;
+          }
+
+          &:nth-child(n + 2) {
+            margin-left: 10px;
+          }
+
+          &:hover {
+            background-color: #2e2e2e;
+          }
+        }
+      }
+
+      transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+      transition-timing-function: cubic-bezier(.4, 0, .2, 1);
+      transition-duration: .15s;
+
+      &:hover {
+        background-color: hsl(240 3.7% 15.9% / .5)
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+.textarea {
+  display: flex;
+
+  color: #fafafa;
+  background-color: transparent;
+
+  border-width: 1px;
+  border-color: hsl(240 3.7% 15.9%);
+  border-radius: calc(0.5rem - 2px);
+
+  min-height: 80px;
+  width: 100%;
+
+  padding: 0.5rem 0.75rem;
+
+  font-size: .875rem;
+  line-height: 1.25rem;
+
+  resize: vertical;
+
+  &:focus-visible {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+
+    box-shadow: 0 0 0 2px hsl(240 10% 3.9%), 0 0 0 4px hsl(240 3.7% 15.9%), 0 0 #0000;
+  }
+}

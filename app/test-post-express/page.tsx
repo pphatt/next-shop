@@ -83,9 +83,9 @@ export default function Home() {
     });
 
     if (data.ok) {
-      console.log("Upload successful");
+
     } else {
-      console.log("Upload failed");
+      throw new Error("Upload failed")
     }
   };
 

@@ -8,18 +8,6 @@ interface DropdownProps extends React.HTMLAttributes<HTMLDivElement> {
   onCheckedChange: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
-/*
-* <DropdownMenu>
-    <DropdownMenuTrigger>{children}</DropdownMenuTrigger>
-    <DropdownMenuContent>
-      <DropdownMenuItem>
-      *
-      </DropdownMenuItem>
-    </DropdownMenuContent>
-* </DropdownMenu>
-*
-* */
-
 export const DropdownMenu = ({
   options,
   checked,

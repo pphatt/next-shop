@@ -66,14 +66,10 @@ const Page = () => {
 
   const parserImageBlob: IProduct[] = useMemo(() => {
     return data?.map((value: IProduct) => {
-      const blob = b64toBlob(value.image, "image/png");
-      const blobURL = URL.createObjectURL(blob);
-      // console.log(blobURL);
-
       return {
         ...value,
-        image: blobURL,
-        hoverImage: blobURL,
+        image: URL.createObjectURL(b64toBlob(value.image[0], "image/png")),
+        hoverImage: URL.createObjectURL(b64toBlob(value.image[1], "image/png")),
       };
     });
   }, [data]);
