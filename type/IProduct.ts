@@ -1,5 +1,5 @@
 export interface IProduct {
-  productName: string;
+  name: string;
   price: string;
   image: string;
   hoverImage: string;

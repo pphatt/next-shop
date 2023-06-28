@@ -16,7 +16,75 @@ import Skeleton from "@/components/ui/skeleton";
 import { IProduct } from "@/type/IProduct";
 import { DropdownMenu } from "@/components/ui/dropdown";
 import Button from "@/components/ui/button";
-import { company, sortOptions, sortPriceOptions, sortScaleOptions } from "@/lib/filter-options";
+import {
+  company,
+  sortOptions,
+  sortPriceOptions,
+  sortScaleOptions,
+} from "@/lib/filter-options";
+import useSWRInfinite from "swr/infinite";
+
+const PAGE_SIZE = 2
+
+function Pages({ index }: { index: number }) {
+  //@ts-ignore
+  const fetcher = (...args) => fetch(...args).then((res) => res.json());
+  const { data, isLoading } = useSWR(
+    `http://localhost:8000/products?page=${index}`,
+    fetcher
+  );
+
+  // ... handle loading and error states
+
+  if (isLoading) {
+    return [...Array(10)].map((_, index) => (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          gap: "10px",
+        }}
+        key={index}
+      >
+        <Skeleton height={329} width={235}></Skeleton>
+        <Skeleton
+          height={40}
+          width={200}
+          style={{ marginTop: "5px" }}
+        ></Skeleton>
+        <Skeleton
+          height={40}
+          width={100}
+          style={{ marginTop: "5px" }}
+        ></Skeleton>
+      </div>
+    ));
+  }
+
+  const parserImageBlob = data?.map((value: IProduct) => {
+    return {
+      ...value,
+      image: URL.createObjectURL(b64toBlob(value.image[0], "image/png")),
+      hoverImage: URL.createObjectURL(b64toBlob(value.image[1], "image/png")),
+    };
+  });
+
+  return (
+    data?.length > 0 &&
+    parserImageBlob.map(
+      (
+        value: {
+          name: string;
+          price: string;
+          image: string;
+          hoverImage: string;
+        },
+        index: number
+      ) => <ProductCard product={value} key={index} />
+    )
+  );
+}
 
 const Page = () => {
   const [page, setPage] = useState<number>(1);
@@ -24,21 +92,21 @@ const Page = () => {
   const [currentPriceOptions, setCurrentPriceOptions] = useState<number[]>([]);
   const [currentScaleOptions, setCurrentScaleOptions] = useState<number[]>([]);
 
-  //@ts-ignore
-  const fetcher = (...args) => fetch(...args).then((res) => res.json());
-  const { data, error, isLoading } = useSWR(
-    `http://localhost:8000/products?page=${page}&manufacture=${filter.join(
-      ","
-    )}&price=${currentPriceOptions.join(",")}&scale=${currentScaleOptions.join(
-      ","
-    )}`,
-    fetcher,
-    {
-      // revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
-  );
+  // //@ts-ignore
+  // const fetcher = (...args) => fetch(...args).then((res) => res.json());
+  // const { data, error, isLoading } = useSWR(
+  //   `http://localhost:8000/products?page=${page}&manufacture=${filter.join(
+  //     ","
+  //   )}&price=${currentPriceOptions.join(",")}&scale=${currentScaleOptions.join(
+  //     ","
+  //   )}`,
+  //   fetcher,
+  //   {
+  //     // revalidateIfStale: false,
+  //     revalidateOnFocus: false,
+  //     revalidateOnReconnect: false,
+  //   }
+  // );
 
   const [currentSortOption, setCurrentSortOption] = useState("Name: A-Z");
   const [sortIsOpen, setSortIsOpen] = useState<boolean>(false);
@@ -64,17 +132,44 @@ const Page = () => {
     [filter]
   );
 
-  const parserImageBlob: IProduct[] = useMemo(() => {
-    return data?.map((value: IProduct) => {
-      return {
-        ...value,
-        image: URL.createObjectURL(b64toBlob(value.image[0], "image/png")),
-        hoverImage: URL.createObjectURL(b64toBlob(value.image[1], "image/png")),
-      };
-    });
-  }, [data]);
+  // @ts-ignore
+  const fetcher = (...args) => fetch(...args).then((res) => res.json());
+  const getKey = (pageIndex: number, previousPageData: any) => {
+    if (previousPageData && !previousPageData.length) return null; // reached the end
 
-  // TODO: add query search for both frontend and backend
+    return `http://localhost:8000/products?page=${pageIndex + 1}`;
+  };
+
+  const {
+    data,
+    mutate,
+    size,
+    setSize,
+    isValidating,
+    isLoading,
+  } = useSWRInfinite(getKey, fetcher);
+
+  const paginatedProducts = data ? data.reduce((previousValue, currentValue) => previousValue.concat(currentValue), []) : [];
+
+  const isLoadingNextPage = isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
+
+  const isEmpty = data?.[0]?.length === 0;
+
+  const isReachingEnd =
+    isEmpty || (data && data[data.length - 1]?.length < PAGE_SIZE);
+
+  const isRefreshing = isValidating && data && data.length === size;
+
+  const parserImageBlob: IProduct[] | undefined = useMemo(() => {
+    if (paginatedProducts !== undefined) {
+      return paginatedProducts?.map((value: IProduct) => {
+        return {
+          ...value,
+          image: URL.createObjectURL(b64toBlob(value.image[0], "image/png")),
+        };
+      });
+    }
+  }, [paginatedProducts]);
 
   return (
     <>
@@ -171,7 +266,7 @@ const Page = () => {
               </div>
             </div>
             <div className={styles["figure-list"]}>
-              <span>Display {page * 10} of 100 figures</span>
+              <span>Display {size * 4} of 100 figures</span>
               <div className={styles["divider"]}></div>
               <div className={styles["figure-list-container"]}>
                 {isLoading &&
@@ -186,23 +281,57 @@ const Page = () => {
                       key={index}
                     >
                       <Skeleton height={329} width={235}></Skeleton>
-                      <Skeleton height={40} width={200} style={{marginTop: "5px"}}></Skeleton>
-                      <Skeleton height={40} width={100} style={{marginTop: "5px"}}></Skeleton>
+                      <Skeleton
+                        height={40}
+                        width={200}
+                        style={{ marginTop: "5px" }}
+                      ></Skeleton>
+                      <Skeleton
+                        height={40}
+                        width={100}
+                        style={{ marginTop: "5px" }}
+                      ></Skeleton>
                     </div>
                   ))}
 
-                {data?.length > 0 &&
-                  parserImageBlob.map(
-                    (
-                      value: {
-                        productName: string;
-                        price: string;
-                        image: string;
-                        hoverImage: string;
-                      },
-                      index: number
-                    ) => <ProductCard product={value} key={index} />
-                  )}
+                {!data ||
+                  (paginatedProducts?.length &&
+                    parserImageBlob?.map(
+                      (
+                        value: {
+                          name: string;
+                          price: string;
+                          image: string;
+                          hoverImage: string;
+                        },
+                        index: number
+                      ) => <ProductCard product={value} key={index} />
+                    ))}
+
+                {isLoadingNextPage &&
+                  [...Array(4)].map((_, index) => (
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        gap: "10px",
+                      }}
+                      key={index}
+                    >
+                      <Skeleton height={329} width={235}></Skeleton>
+                      <Skeleton
+                        height={40}
+                        width={200}
+                        style={{ marginTop: "5px" }}
+                      ></Skeleton>
+                      <Skeleton
+                        height={40}
+                        width={100}
+                        style={{ marginTop: "5px" }}
+                      ></Skeleton>
+                    </div>
+                  ))}
               </div>
               <div className={styles["divider"]}></div>
               <div className={styles["pages-container"]}>
@@ -212,7 +341,7 @@ const Page = () => {
             </div>
           </div>
 
-          <Button onClick={() => setPage(page + 1)}>Show more</Button>
+          <Button disabled={isLoadingNextPage || isReachingEnd} onClick={() => setSize(size + 1)}>Show more</Button>
         </div>
       </div>
 

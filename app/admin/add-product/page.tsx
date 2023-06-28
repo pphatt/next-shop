@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useContext, useState } from "react";
+import React, { useCallback, useContext, useMemo, useState } from "react"
 import AccountHeader from "@/components/account-header";
 import styles from "@/styles/account-layout.module.scss";
 import Link from "next/link";
@@ -26,7 +26,7 @@ const Page = () => {
   const upload = async (e: any) => {
     e.preventDefault();
 
-    const { name, manufacturer, scale, price } = e.target;
+    const { name, manufacturer, scale, price, state } = e.target;
 
     // if (name.value) {
     //
@@ -43,6 +43,7 @@ const Page = () => {
         manufacturer: manufacturer.value,
         scale: scale.value,
         image: pictures,
+        state: state.value
       }),
     });
 
@@ -87,8 +88,12 @@ const Page = () => {
     { href: "/admin/add-product", name: "Add Product" },
   ];
 
+  const state = useMemo(() => {
+    return ["Available", "Shorted", "Deleted", "Upcoming"]
+  }, [])
+
   return (
-    <div className={styles["account-layout"]}>
+    <div className={styles["account-layout"]} style={{overflow: "hidden"}}>
       <AccountHeader />
 
       <main className={styles["content-layout"]}>
@@ -175,6 +180,27 @@ const Page = () => {
                       <SelectLabel value={"Scale"}></SelectLabel>
 
                       {sortScaleOptions.map((value, index) => (
+                        <SelectItem key={index} value={value} />
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div
+                  className={styles["input-section"]}
+                  style={{ marginBottom: "20px", marginLeft: "30px" }}
+                >
+                  <label>State</label>
+
+                  <Select>
+                    <SelectTrigger name={"state"}>
+                      <SelectValue placeholder={"Select state"} />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      <SelectLabel value={"State"}></SelectLabel>
+
+                      {state.map((value, index) => (
                         <SelectItem key={index} value={value} />
                       ))}
                     </SelectContent>

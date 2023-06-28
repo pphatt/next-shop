@@ -11,7 +11,7 @@ export default function Carousel() {
 
 interface CarouselProductCardProps
   extends React.HTMLAttributes<HTMLDivElement> {
-  product: { productName: string; image: string; price: string };
+  product: { name: string; image: string; price: string };
   length: number;
   position: number;
   index: number;
@@ -51,7 +51,7 @@ Carousel.ProductCard = function CarouselProductCard({
           </div>
           <div className={styles["product-information"]}>
             <div style={{ height: "50px", maxHeight: "44px" }}>
-              {product.productName}
+              {product.name}
             </div>
             <div style={{ fontWeight: "500" }}>${product.price}</div>
             <div className={styles["view"]}>
@@ -65,7 +65,7 @@ Carousel.ProductCard = function CarouselProductCard({
 };
 
 interface CarouselLayoutProps extends React.HTMLAttributes<HTMLDivElement> {
-  products: { productName: string; image: string; price: string }[];
+  products: { name: string; image: string; price: string }[];
   line_1: string;
   line_2: string;
 }

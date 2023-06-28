@@ -28,6 +28,12 @@
   font-size: .875rem;
   line-height: 1.25rem;
 
+  caption-side: bottom;
+
+  .table-caption {
+    margin-top: 1rem
+  }
+
   thead {
     tr {
       th {
@@ -73,6 +79,10 @@
         line-height: 1.25rem;
 
         vertical-align: middle;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
 
         .no-product-message {
           display: flex;

@@ -3,7 +3,7 @@ import styles from "@/styles/components/card.module.scss";
 
 interface ProductCardProps extends React.HTMLAttributes<HTMLDivElement> {
   product: {
-    productName: string;
+    name: string;
     price: string;
     image: string;
     hoverImage: string;
@@ -35,7 +35,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
       </div>
       <span className={styles["product-information"]}>
-        {product.productName}
+        {product.name}
       </span>
       <span className={styles["product-information"]}>{product.price}₫</span>
     </a>

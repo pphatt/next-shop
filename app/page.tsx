@@ -22,16 +22,14 @@ export default function Home() {
   );
 
   const parserImageBlob: IProduct[] = useMemo(() => {
-    return data?.map((value: IProduct) => {
-      const blob = b64toBlob(value.image, "image/png");
-      const blobURL = URL.createObjectURL(blob);
-      console.log(blobURL);
-
-      return {
-        ...value,
-        image: blobURL,
-      };
-    });
+    if (typeof window !== "undefined") {
+      return data?.map((value: IProduct) => {
+        return {
+          ...value,
+          image: URL.createObjectURL(b64toBlob(value.image[0], "image/png")),
+        };
+      });
+    }
   }, [data]);
 
   return (
