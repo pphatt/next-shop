@@ -10,10 +10,13 @@
 
 html,
 body {
+  overflow-x: hidden;
+  margin-right: calc(-1 * (100vw - 100%));
+
   min-height: 100vh;
   max-width: 100vw;
   font-family: "Roboto", ui-sans-serif, system-ui, -apple-system,
-  BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans,
-  sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol,
-  Noto Color Emoji;
+    BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans,
+    sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol,
+    Noto Color Emoji;
 }

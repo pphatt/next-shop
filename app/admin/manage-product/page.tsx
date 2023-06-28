@@ -103,7 +103,7 @@ const Page = () => {
     <div className={styles["account-layout"]}>
       <AccountHeader />
 
-      <main className={styles["content-layout"]} style={{ maxWidth: "110rem" }}>
+      <main className={styles["content-layout"]} style={{ maxWidth: "85rem" }}>
         <div className={styles["inner-content-layout"]}>
           <div
             className={styles["account-navigation-layout"]}
@@ -208,49 +208,49 @@ const Page = () => {
                     <TableRow key={index}>
                       <TableCell>
                         <Skeleton
-                          width={150}
+                          width={73.375}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={250}
+                          width={178.75}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={150}
+                          width={100}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={130}
+                          width={80}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={130}
+                          width={80}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={250}
+                          width={200}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={115}
+                          width={60}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
@@ -266,13 +266,15 @@ const Page = () => {
                       index: number
                     ) => (
                       <TableRow key={index}>
-                        <TableCell style={{ maxWidth: "150px" }}>
+                        <TableCell style={{ maxWidth: "100px" }}>
                           {_id}
                         </TableCell>
-                        <TableCell style={{ maxWidth: "250px" }}>
+                        <TableCell style={{ maxWidth: "200px" }}>
                           {name}
                         </TableCell>
-                        <TableCell style={{ maxWidth: "150px" }}>{manufacturer}</TableCell>
+                        <TableCell style={{ maxWidth: "100px" }}>
+                          {manufacturer}
+                        </TableCell>
                         <TableCell>{price}</TableCell>
                         <TableCell>{scale}</TableCell>
                         <TableCell>Something here is really long</TableCell>
@@ -282,54 +284,55 @@ const Page = () => {
                     )
                   )}
 
-                {(isLoadingNextPage && !isLoading) &&
+                {isLoadingNextPage &&
+                  !isLoading &&
                   [...Array(4)].map((_, index) => (
                     <TableRow key={index}>
                       <TableCell>
                         <Skeleton
-                          width={150}
+                          width={73.375}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={250}
+                          width={178.75}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={150}
+                          width={100}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={130}
+                          width={80}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={130}
+                          width={80}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={280}
+                          width={200}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={115}
+                          width={60}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />

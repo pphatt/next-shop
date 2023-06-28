@@ -24,67 +24,7 @@ import {
 } from "@/lib/filter-options";
 import useSWRInfinite from "swr/infinite";
 
-const PAGE_SIZE = 2
-
-function Pages({ index }: { index: number }) {
-  //@ts-ignore
-  const fetcher = (...args) => fetch(...args).then((res) => res.json());
-  const { data, isLoading } = useSWR(
-    `http://localhost:8000/products?page=${index}`,
-    fetcher
-  );
-
-  // ... handle loading and error states
-
-  if (isLoading) {
-    return [...Array(10)].map((_, index) => (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          gap: "10px",
-        }}
-        key={index}
-      >
-        <Skeleton height={329} width={235}></Skeleton>
-        <Skeleton
-          height={40}
-          width={200}
-          style={{ marginTop: "5px" }}
-        ></Skeleton>
-        <Skeleton
-          height={40}
-          width={100}
-          style={{ marginTop: "5px" }}
-        ></Skeleton>
-      </div>
-    ));
-  }
-
-  const parserImageBlob = data?.map((value: IProduct) => {
-    return {
-      ...value,
-      image: URL.createObjectURL(b64toBlob(value.image[0], "image/png")),
-      hoverImage: URL.createObjectURL(b64toBlob(value.image[1], "image/png")),
-    };
-  });
-
-  return (
-    data?.length > 0 &&
-    parserImageBlob.map(
-      (
-        value: {
-          name: string;
-          price: string;
-          image: string;
-          hoverImage: string;
-        },
-        index: number
-      ) => <ProductCard product={value} key={index} />
-    )
-  );
-}
+const PAGE_SIZE = 2;
 
 const Page = () => {
   const [page, setPage] = useState<number>(1);
@@ -140,18 +80,18 @@ const Page = () => {
     return `http://localhost:8000/products?page=${pageIndex + 1}`;
   };
 
-  const {
-    data,
-    mutate,
-    size,
-    setSize,
-    isValidating,
-    isLoading,
-  } = useSWRInfinite(getKey, fetcher);
+  const { data, mutate, size, setSize, isValidating, isLoading } =
+    useSWRInfinite(getKey, fetcher);
 
-  const paginatedProducts = data ? data.reduce((previousValue, currentValue) => previousValue.concat(currentValue), []) : [];
+  const paginatedProducts = data
+    ? data.reduce(
+        (previousValue, currentValue) => previousValue.concat(currentValue),
+        []
+      )
+    : [];
 
-  const isLoadingNextPage = isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
+  const isLoadingNextPage =
+    isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
 
   const isEmpty = data?.[0]?.length === 0;
 
@@ -341,7 +281,12 @@ const Page = () => {
             </div>
           </div>
 
-          <Button disabled={isLoadingNextPage || isReachingEnd} onClick={() => setSize(size + 1)}>Show more</Button>
+          <Button
+            disabled={isLoadingNextPage || isReachingEnd}
+            onClick={() => setSize(size + 1)}
+          >
+            Show more
+          </Button>
         </div>
       </div>
 
