@@ -20,6 +20,8 @@
   width: 100%;
 
   border-collapse: separate;
+  border-collapse: collapse;
+
   border-spacing: 0;
   text-indent: 0;
 
@@ -67,8 +69,9 @@
     tr {
       position: relative;
 
-      border-bottom-width: 1px;
-      border-bottom-color: hsl(240 3.7% 15.9%);
+      &:not(:last-child) {
+        border-bottom-width: 1px;
+      }
 
       td {
         color: #fafafa;

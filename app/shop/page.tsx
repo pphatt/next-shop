@@ -103,9 +103,16 @@ const Page = () => {
   const parserImageBlob: IProduct[] | undefined = useMemo(() => {
     if (paginatedProducts !== undefined) {
       return paginatedProducts?.map((value: IProduct) => {
+        let hoverImage = ""
+
+        if (value?.image[1]) {
+          hoverImage = URL.createObjectURL(b64toBlob(value.image[1], "image/png"))
+        }
+
         return {
           ...value,
           image: URL.createObjectURL(b64toBlob(value.image[0], "image/png")),
+          hoverImage
         };
       });
     }

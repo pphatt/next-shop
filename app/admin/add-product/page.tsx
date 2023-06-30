@@ -1,5 +1,11 @@
 "use client";
-import React, { useCallback, useContext, useMemo, useState } from "react"
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import AccountHeader from "@/components/account-header";
 import styles from "@/styles/account-layout.module.scss";
 import Link from "next/link";
@@ -18,19 +24,38 @@ import {
   NavigationMenu,
   NavigationMenuLink,
 } from "@/components/ui/navigation-menu";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  Toast,
+  ToastAction,
+  ToastContent,
+  ToastExit,
+  ToastHeader,
+  ToastText,
+} from "@/components/ui/toast";
 
 const Page = () => {
   const [pictures, setPictures] = useState<Buffer[]>([]);
-  const [error, setError] = useState("");
+  const [message, setMessage] = useState({ status: "closed", message: {message: ""} });
+  const router = useRouter();
+
+  const searchParams = useSearchParams();
 
   const upload = async (e: any) => {
     e.preventDefault();
 
-    const { name, manufacturer, scale, price, state } = e.target;
+    const { name, manufacturer, scale, price, state, picture } = e.target;
 
-    // if (name.value) {
-    //
-    // }
+    if (!name || name.value.length <= 5) {
+      name.value = "";
+      setMessage({
+        status: "open",
+        message: {
+          message: "Name must be at least 5 characters"
+        },
+      });
+      return;
+    }
 
     const data = await fetch("http://localhost:8000/products", {
       method: "POST",
@@ -43,14 +68,14 @@ const Page = () => {
         manufacturer: manufacturer.value,
         scale: scale.value,
         image: pictures,
-        state: state.value
+        state: state.value,
       }),
     });
 
     if (data.ok) {
-      console.log("Upload successfully");
-    } else {
-      throw new Error("Upload failed");
+      const message = await data.json();
+      e.target.reset()
+      setMessage({ status: "open", message: message });
     }
   };
 
@@ -89,12 +114,39 @@ const Page = () => {
   ];
 
   const state = useMemo(() => {
-    return ["Available", "Shorted", "Deleted", "Upcoming"]
-  }, [])
+    return ["Available", "Shorted", "Deleted", "Upcoming"];
+  }, []);
+
+  const handleAnimationEnd = useCallback(
+    (animationEvent: React.AnimationEvent<HTMLDivElement>) => {
+      if (animationEvent.animationName.includes("exit")) {
+        setMessage({ status: "closed", message: {message: "Name must be at least 5 characters"} });
+      }
+    },
+    [message]
+  );
 
   return (
-    <div className={styles["account-layout"]} style={{overflow: "hidden"}}>
+    <div className={styles["account-layout"]} style={{ overflow: "hidden" }}>
       <AccountHeader />
+
+      {message.message && (
+        <>
+          <Toast state={message.status} onAnimationEnd={handleAnimationEnd}>
+            <ToastExit
+              onClick={() => {
+                console.log("yeah");
+                setMessage({ ...message, status: "closed" });
+              }}
+            />
+            <ToastContent>
+              <ToastHeader>{message.message.message}</ToastHeader>
+              <ToastText>Add Product Successfully</ToastText>
+            </ToastContent>
+            <ToastAction>View</ToastAction>
+          </Toast>
+        </>
+      )}
 
       <main className={styles["content-layout"]}>
         <div className={styles["inner-content-layout"]}>
@@ -112,14 +164,16 @@ const Page = () => {
             </div>
           </div>
           <div className={styles["content-panel"]}>
-            <NavigationMenu style={{width: "640px"}}>
-              {routes.map(({href , name}, index) => (
-                <NavigationMenuLink key={index} href={href}>{name}</NavigationMenuLink>
+            <NavigationMenu style={{ width: "640px" }}>
+              {routes.map(({ href, name }, index) => (
+                <NavigationMenuLink key={index} href={href}>
+                  {name}
+                </NavigationMenuLink>
               ))}
             </NavigationMenu>
 
             <form
-              style={{paddingTop: "16px"}}
+              style={{ paddingTop: "16px" }}
               className={styles["add-product-form"]}
               method={"POST"}
               encType={"multipart/form-data"}

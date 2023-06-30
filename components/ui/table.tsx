@@ -8,9 +8,7 @@ const Table = ({ children }: TableProps) => {
     <section className={styles["table-layout"]}>
       <div className={styles["outer-table-layout"]}>
         <div className={styles["inner-table-layout"]}>
-          <table className={styles["table"]}>
-            {children}
-          </table>
+          <table className={styles["table"]}>{children}</table>
         </div>
       </div>
     </section>
@@ -21,9 +19,11 @@ interface TableCaptionProps extends React.HTMLAttributes<HTMLElement> {}
 
 const TableCaption = ({ children, ...props }: TableCaptionProps) => {
   return (
-    <caption className={styles["table-caption"]} {...props}>{children}</caption>
-  )
-}
+    <caption className={styles["table-caption"]} {...props}>
+      {children}
+    </caption>
+  );
+};
 
 interface TableRowProps extends React.HTMLAttributes<HTMLTableRowElement> {}
 
@@ -57,4 +57,21 @@ const TableCell = ({ children, ...props }: TableCellProps) => {
   return <td {...props}>{children}</td>;
 };
 
-export { Table, TableCaption, TableRow, TableHeader, TableHead, TableBody, TableCell };
+interface TableActionProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+const TableAction = ({ children, ...props }: TableActionProps) => {
+  return (
+    <div {...props} className={styles["view"]}>{children}</div>
+  )
+};
+
+export {
+  Table,
+  TableCaption,
+  TableRow,
+  TableHeader,
+  TableHead,
+  TableBody,
+  TableCell,
+  TableAction,
+};

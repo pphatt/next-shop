@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import AccountHeader from "@/components/account-header";
 import styles from "@/styles/account-layout.module.scss";
 import Link from "next/link";
@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import {
   Table,
+  TableAction,
   TableBody,
   TableCaption,
   TableCell,
@@ -25,11 +26,19 @@ import {
   SelectValue,
 } from "@/components/ui/account-dropdown";
 import { company, sortScaleOptions } from "@/lib/filter-options";
-import useSWR from "swr";
 import Skeleton from "@/components/ui/skeleton";
-import { KeyRound } from "lucide-react";
+import { Delete, Edit, KeyRound, PackageSearch } from "lucide-react";
 import AccountButton from "@/components/ui/account-button";
 import useSWRInfinite from "swr/infinite";
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface IProduct {
   _id: string;
@@ -40,7 +49,7 @@ interface IProduct {
   state: "Active";
 }
 
-const PAGE_SIZE = 2;
+const PAGE_SIZE = 6;
 
 const Page = () => {
   const routes = [
@@ -53,21 +62,26 @@ const Page = () => {
   const [currentPriceOptions, setCurrentPriceOptions] = useState<number[]>([]);
   const [currentScaleOptions, setCurrentScaleOptions] = useState<number[]>([]);
 
-  //@ts-ignore
-  // const fetcher = (...args) => fetch(...args).then((res) => res.json());
-  // const { data, isLoading } = useSWR<IProduct[]>(
-  //   `http://localhost:8000/products?page=${page}&manufacture=${filter.join(
-  //     ","
-  //   )}&price=${currentPriceOptions.join(",")}&scale=${currentScaleOptions.join(
-  //     ","
-  //   )}&name=`,
-  //   fetcher,
-  //   {
-  //     // revalidateIfStale: true,
-  //     // revalidateOnFocus: true,
-  //     // revalidateOnReconnect: true,
-  //   }
-  // );
+  const [deleteState, setDeleteState] = useState(false);
+
+  const [deleteProduct, setDeleteProduct] = useState(false);
+
+  const [productInfo, setProductInfo] = useState({
+    status: "closed",
+    id: "",
+    name: "",
+    price: "",
+  });
+
+  // const { mutate } = useSWRConfig();
+
+  /*
+  * TODO:
+  *  - Delete product request is not really good
+  *    -> animation should wait until the data is validated
+  *    -> how things are implemented here is not really optimized
+  *  - product controller server is not really optimized
+  * */
 
   // @ts-ignore
   const fetcher = (...args) => fetch(...args).then((res) => res.json());
@@ -77,37 +91,122 @@ const Page = () => {
     return `http://localhost:8000/products?page=${pageIndex + 1}`;
   };
 
-  const { data, mutate, size, setSize, isValidating, isLoading } =
-    useSWRInfinite(getKey, fetcher);
+  const {
+    data: product,
+    mutate,
+    size,
+    setSize,
+    isValidating,
+    isLoading,
+  } = useSWRInfinite(getKey, fetcher);
 
-  const paginatedProducts: IProduct[] = data
-    ? data.reduce(
+  const paginatedProducts: IProduct[] = product
+    ? product.reduce(
         (previousValue, currentValue) => previousValue.concat(currentValue),
         []
       )
     : [];
 
   const isLoadingNextPage =
-    isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
+    isLoading ||
+    (size > 0 && product && typeof product[size - 1] === "undefined");
 
-  const isEmpty = data?.[0]?.length === 0;
+  const isEmpty = product?.[0]?.length === 0;
 
   const isReachingEnd =
-    isEmpty || (data && data[data.length - 1]?.length < PAGE_SIZE);
+    isEmpty || (product && product[product.length - 1]?.length < PAGE_SIZE);
 
-  const isRefreshing = isValidating && data && data.length === size;
+  const isRefreshing = isValidating && product && product.length === size;
 
-  console.log(data);
+  const handleDelete = async (e: any) => {
+    e.preventDefault();
+
+    const data = await fetch("http://localhost:8000/products", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: productInfo.id,
+      }),
+    });
+
+    if (data.ok) {
+      mutate();
+      setDeleteProduct(true);
+    }
+  };
+
+  const handleAnimationEnd = useCallback(
+    (animationEvent: React.AnimationEvent<HTMLDivElement>) => {
+      if (animationEvent.animationName.includes("exit")) {
+        setProductInfo({
+          status: "closed",
+          id: "",
+          name: "",
+          price: "",
+        });
+      }
+    },
+    []
+  );
 
   return (
     <div className={styles["account-layout"]}>
       <AccountHeader />
 
-      <main className={styles["content-layout"]} style={{ maxWidth: "85rem" }}>
+      {productInfo.id && (
+        <>
+          <DialogBackdrop
+            onClick={() => setProductInfo({ ...productInfo, status: "closed" })}
+          />
+          <Dialog state={productInfo.status} onAnimationEnd={handleAnimationEnd}>
+            <DialogHeader>
+              <DialogTitle>Delete product confirmation</DialogTitle>
+              <DialogDescription>
+                Delete product. Click delete when you are sure
+              </DialogDescription>
+            </DialogHeader>
+
+            <DialogContent>
+              <div style={{ display: "flex" }}>
+                <span style={{ display: "block", width: "53px" }}>ID: </span>
+                <span>{productInfo.id}</span>
+              </div>
+              <div style={{ display: "flex" }}>
+                <span style={{ display: "block", width: "53px" }}>Name:</span>
+                <span>{productInfo.name}</span>
+              </div>
+              <div style={{ display: "flex" }}>
+                <span style={{ display: "block", width: "53px" }}>Price: </span>
+                <span>{productInfo.price}₫</span>
+              </div>
+            </DialogContent>
+
+            <form
+              onSubmit={handleDelete}
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+              }}
+            >
+              <DialogTrigger
+                onClick={() =>
+                  setProductInfo({ ...productInfo, status: "closed" })
+                }
+              >
+                Delete
+              </DialogTrigger>
+            </form>
+          </Dialog>
+        </>
+      )}
+
+      <main className={styles["content-layout"]}>
         <div className={styles["inner-content-layout"]}>
           <div
             className={styles["account-navigation-layout"]}
-            style={{ maxWidth: "240px" }}
+            style={{ flex: "0.2", width: "100%" }}
           >
             <div className={styles["account-navigation"]}>
               <Link href={"/setting"} data-state={false}>
@@ -183,15 +282,13 @@ const Page = () => {
               </TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "5px",
-                    }}
-                  >
-                    <KeyRound width={15} height={15} />
-                    ID
+                  <TableHead>
+                    <KeyRound
+                      width={15}
+                      height={15}
+                      style={{ verticalAlign: "middle" }}
+                    />
+                    <span style={{ marginLeft: "5px" }}>ID</span>
                   </TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Manufacturer</TableHead>
@@ -199,7 +296,7 @@ const Page = () => {
                   <TableHead>Scale</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead>State</TableHead>
-                  <TableHead></TableHead>
+                  <TableHead style={{ width: "15%" }}></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -208,58 +305,70 @@ const Page = () => {
                     <TableRow key={index}>
                       <TableCell>
                         <Skeleton
-                          width={73.375}
+                          width={71.844}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={178.75}
+                          width={172.5}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={100}
+                          width={91.5}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={80}
+                          width={75.906}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={80}
+                          width={76.219}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={200}
+                          width={195.984}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={60}
+                          width={69.578}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
-                      <TableCell></TableCell>
+                      <TableCell
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "flex-end",
+                        }}
+                      >
+                        <Skeleton
+                          width={140.219}
+                          height={20}
+                          style={{ background: "hsl(240 3.7% 15.9%)" }}
+                        />
+                      </TableCell>
                     </TableRow>
                   ))}
 
-                {data?.length &&
+                {product?.length &&
                   paginatedProducts.map(
                     (
                       { _id, name, manufacturer, price, scale, state },
@@ -275,11 +384,60 @@ const Page = () => {
                         <TableCell style={{ maxWidth: "100px" }}>
                           {manufacturer}
                         </TableCell>
-                        <TableCell>{price}</TableCell>
+                        <TableCell>{price}₫</TableCell>
                         <TableCell>{scale}</TableCell>
                         <TableCell>Something here is really long</TableCell>
                         <TableCell>{state}</TableCell>
-                        <TableCell></TableCell>
+                        <TableCell>
+                          <TableAction>
+                            <Link href={"/"}>
+                              <PackageSearch
+                                style={{
+                                  display: "block",
+                                  verticalAlign: "middle",
+                                  color: "#fafafa",
+                                  textDecoration: "none",
+                                }}
+                                width={15}
+                                height={15}
+                              />
+                            </Link>
+                            <Link href={"/"}>
+                              <Edit
+                                style={{
+                                  display: "block",
+                                  verticalAlign: "middle",
+                                  color: "#fafafa",
+                                  textDecoration: "none",
+                                }}
+                                width={15}
+                                height={15}
+                              />
+                            </Link>
+                            <button
+                              type={"button"}
+                              onClick={() =>
+                                setProductInfo({
+                                  status: "open",
+                                  id: _id,
+                                  name: name,
+                                  price: price,
+                                })
+                              }
+                            >
+                              <Delete
+                                style={{
+                                  display: "block",
+                                  verticalAlign: "middle",
+                                  color: "#fafafa",
+                                  textDecoration: "none",
+                                }}
+                                width={15}
+                                height={15}
+                              />
+                            </button>
+                          </TableAction>
+                        </TableCell>
                       </TableRow>
                     )
                   )}
@@ -290,54 +448,66 @@ const Page = () => {
                     <TableRow key={index}>
                       <TableCell>
                         <Skeleton
-                          width={73.375}
+                          width={71.844}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={178.75}
+                          width={172.5}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={100}
+                          width={91.5}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={80}
+                          width={75.906}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={80}
+                          width={76.219}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={200}
+                          width={195.984}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
                       <TableCell>
                         <Skeleton
-                          width={60}
+                          width={69.578}
                           height={20}
                           style={{ background: "hsl(240 3.7% 15.9%)" }}
                         />
                       </TableCell>
-                      <TableCell></TableCell>
+                      <TableCell
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "flex-end",
+                        }}
+                      >
+                        <Skeleton
+                          width={140.219}
+                          height={20}
+                          style={{ background: "hsl(240 3.7% 15.9%)" }}
+                        />
+                      </TableCell>
                     </TableRow>
                   ))}
               </TableBody>
