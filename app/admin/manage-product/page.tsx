@@ -89,7 +89,7 @@ const Page = () => {
   const getKey = (pageIndex: number, previousPageData: any) => {
     if (previousPageData && !previousPageData.length) return null; // reached the end
 
-    return `http://localhost:8000/products?page=${
+    return `https://api-figure-shop.onrender.com/products?page=${
       pageIndex + 1
     }&search=${filter}`;
   };
@@ -126,7 +126,7 @@ const Page = () => {
 
     setDeleteProduct(true);
 
-    const data = await fetch("http://localhost:8000/products", {
+    const data = await fetch("https://api-figure-shop.onrender.com/products", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

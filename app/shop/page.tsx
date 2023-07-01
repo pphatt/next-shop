@@ -77,7 +77,7 @@ const Page = () => {
   const getKey = (pageIndex: number, previousPageData: any) => {
     if (previousPageData && !previousPageData.length) return null; // reached the end
 
-    return `http://localhost:8000/products?page=${pageIndex + 1}`;
+    return `https://api-figure-shop.onrender.com/products?page=${pageIndex + 1}`;
   };
 
   const { data, mutate, size, setSize, isValidating, isLoading } =

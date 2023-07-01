@@ -70,7 +70,7 @@ export default function Home() {
     const { name, price, manufacturer } = e.target;
     // console.log(manufacturer.value)
 
-    const data = await fetch("http://localhost:8000/products", {
+    const data = await fetch("https://api-figure-shop.onrender.com/products", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

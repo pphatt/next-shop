@@ -12,7 +12,7 @@ export default function Home() {
   //@ts-ignore
   const fetcher = (...args) => fetch(...args).then((res) => res.json());
   const { data, error, isLoading } = useSWR(
-    "http://localhost:8000/products",
+    "https://api-figure-shop.onrender.com/products",
     fetcher,
     {
       revalidateIfStale: false,
