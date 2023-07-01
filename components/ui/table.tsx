@@ -51,7 +51,7 @@ const TableBody = ({ children, ...props }: TableBodyProps) => {
   return <tbody {...props}>{children}</tbody>;
 };
 
-interface TableCellProps extends React.HTMLAttributes<HTMLTableCellElement> {}
+interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {}
 
 const TableCell = ({ children, ...props }: TableCellProps) => {
   return <td {...props}>{children}</td>;
@@ -61,8 +61,10 @@ interface TableActionProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 const TableAction = ({ children, ...props }: TableActionProps) => {
   return (
-    <div {...props} className={styles["view"]}>{children}</div>
-  )
+    <div {...props} className={styles["view"]}>
+      {children}
+    </div>
+  );
 };
 
 export {

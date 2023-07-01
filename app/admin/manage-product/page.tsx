@@ -27,7 +27,13 @@ import {
 } from "@/components/ui/account-dropdown";
 import { company, sortScaleOptions } from "@/lib/filter-options";
 import Skeleton from "@/components/ui/skeleton";
-import { Delete, Edit, KeyRound, PackageSearch } from "lucide-react";
+import {
+  BadgeAlert,
+  Delete,
+  Edit,
+  KeyRound,
+  PackageSearch,
+} from "lucide-react";
 import AccountButton from "@/components/ui/account-button";
 import useSWRInfinite from "swr/infinite";
 import {
@@ -41,6 +47,7 @@ import {
 } from "@/components/ui/dialog";
 
 interface IProduct {
+  message?: string;
   _id: string;
   name: string;
   price: string;
@@ -198,9 +205,18 @@ const Page = () => {
             >
               <DialogTrigger disabled={deleteProduct}>
                 {deleteProduct && (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                       stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                       className="mr-2 h-4 w-4 animate-spin">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mr-2 h-4 w-4 animate-spin"
+                  >
                     <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
                   </svg>
                 )}
@@ -377,7 +393,30 @@ const Page = () => {
                     </TableRow>
                   ))}
 
+                {paginatedProducts[0]?.message && (
+                  <TableRow>
+                    <TableCell colSpan={8}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                        }}
+                      >
+                        <BadgeAlert
+                          style={{
+                            display: "block",
+                            verticalAlign: "center",
+                          }}
+                        />
+                        <span>{paginatedProducts[0]?.message}</span>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+
                 {product?.length &&
+                  !paginatedProducts[0]?.message &&
                   paginatedProducts.map(
                     (
                       { _id, name, manufacturer, price, scale, state },
