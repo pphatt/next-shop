@@ -57,23 +57,17 @@ const Page = () => {
     { href: "/admin/add-product", name: "Add Product" },
   ];
 
-  const [page, setPage] = useState(1);
   const [filter, setFilter] = useState<string>("");
   const [currentPriceOptions, setCurrentPriceOptions] = useState<number[]>([]);
   const [currentScaleOptions, setCurrentScaleOptions] = useState<number[]>([]);
 
-  const [deleteState, setDeleteState] = useState(false);
-
   const [deleteProduct, setDeleteProduct] = useState(false);
-
   const [productInfo, setProductInfo] = useState({
     status: "closed",
     id: "",
     name: "",
     price: "",
   });
-
-  // const { mutate } = useSWRConfig();
 
   /*
    * TODO:
