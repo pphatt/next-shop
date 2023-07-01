@@ -35,7 +35,7 @@ const DialogBackdrop = ({ ...props }: DialogBackdropProps) => {
   return <div className={styles["backdrop"]} {...props}></div>;
 };
 
-interface DialogTriggerProps extends React.HTMLAttributes<HTMLElement> {}
+interface DialogTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
 
 const DialogTrigger = ({ children, ...props }: DialogTriggerProps) => {
   return (

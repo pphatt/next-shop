@@ -58,7 +58,7 @@ const Page = () => {
   ];
 
   const [page, setPage] = useState(1);
-  const [filter, setFilter] = useState<number[]>([]);
+  const [filter, setFilter] = useState<string>("");
   const [currentPriceOptions, setCurrentPriceOptions] = useState<number[]>([]);
   const [currentScaleOptions, setCurrentScaleOptions] = useState<number[]>([]);
 
@@ -76,19 +76,21 @@ const Page = () => {
   // const { mutate } = useSWRConfig();
 
   /*
-  * TODO:
-  *  - Delete product request is not really good
-  *    -> animation should wait until the data is validated
-  *    -> how things are implemented here is not really optimized
-  *  - product controller server is not really optimized
-  * */
+   * TODO:
+   *  - Delete product request is not really good
+   *    -> animation should wait until the data is validated
+   *    -> how things are implemented here is not really optimized
+   *  - product controller server is not really optimized
+   * */
 
   // @ts-ignore
   const fetcher = (...args) => fetch(...args).then((res) => res.json());
   const getKey = (pageIndex: number, previousPageData: any) => {
     if (previousPageData && !previousPageData.length) return null; // reached the end
 
-    return `http://localhost:8000/products?page=${pageIndex + 1}`;
+    return `http://localhost:8000/products?page=${
+      pageIndex + 1
+    }&search=${filter}`;
   };
 
   const {
@@ -121,6 +123,8 @@ const Page = () => {
   const handleDelete = async (e: any) => {
     e.preventDefault();
 
+    setDeleteProduct(true);
+
     const data = await fetch("http://localhost:8000/products", {
       method: "DELETE",
       headers: {
@@ -132,8 +136,9 @@ const Page = () => {
     });
 
     if (data.ok) {
-      mutate();
-      setDeleteProduct(true);
+      const validating = await mutate();
+      setDeleteProduct(false);
+      setProductInfo({ ...productInfo, status: "closed" });
     }
   };
 
@@ -158,9 +163,16 @@ const Page = () => {
       {productInfo.id && (
         <>
           <DialogBackdrop
-            onClick={() => setProductInfo({ ...productInfo, status: "closed" })}
+            onClick={() => {
+              if (!deleteProduct) {
+                setProductInfo({ ...productInfo, status: "closed" });
+              }
+            }}
           />
-          <Dialog state={productInfo.status} onAnimationEnd={handleAnimationEnd}>
+          <Dialog
+            state={productInfo.status}
+            onAnimationEnd={handleAnimationEnd}
+          >
             <DialogHeader>
               <DialogTitle>Delete product confirmation</DialogTitle>
               <DialogDescription>
@@ -190,11 +202,14 @@ const Page = () => {
                 justifyContent: "flex-end",
               }}
             >
-              <DialogTrigger
-                onClick={() =>
-                  setProductInfo({ ...productInfo, status: "closed" })
-                }
-              >
+              <DialogTrigger disabled={deleteProduct}>
+                {deleteProduct && (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                       className="mr-2 h-4 w-4 animate-spin">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                  </svg>
+                )}
                 Delete
               </DialogTrigger>
             </form>
@@ -236,7 +251,7 @@ const Page = () => {
                   type={"text"}
                   name={"name"}
                   placeholder={"Filter name"}
-                  required
+                  onChange={(e) => setFilter(e.target.value)}
                 />
               </div>
               <div>
