@@ -23,6 +23,8 @@ import {
   sortScaleOptions,
 } from "@/lib/filter-options";
 import useSWRInfinite from "swr/infinite";
+import { cn } from "@/lib/utils"
+import classNames from "classnames"
 
 const PAGE_SIZE = 2;
 

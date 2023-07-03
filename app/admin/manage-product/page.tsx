@@ -38,13 +38,16 @@ import AccountButton from "@/components/ui/account-button";
 import useSWRInfinite from "swr/infinite";
 import {
   Dialog,
-  DialogBackdrop,
+  DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/components/ui/shadcn-dialog";
+
+import { Button } from "@/components/ui/button";
 
 interface IProduct {
   message?: string;
@@ -69,12 +72,6 @@ const Page = () => {
   const [currentScaleOptions, setCurrentScaleOptions] = useState<number[]>([]);
 
   const [deleteProduct, setDeleteProduct] = useState(false);
-  const [productInfo, setProductInfo] = useState({
-    status: "closed",
-    id: "",
-    name: "",
-    price: "",
-  });
 
   /*
    * TODO:
@@ -121,7 +118,10 @@ const Page = () => {
 
   const isRefreshing = isValidating && product && product.length === size;
 
-  const handleDelete = async (e: any) => {
+  const handleDelete = async (
+    e: React.FormEvent<HTMLFormElement>,
+    id: string
+  ) => {
     e.preventDefault();
 
     setDeleteProduct(true);
@@ -132,100 +132,19 @@ const Page = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        id: productInfo.id,
+        id: id,
       }),
     });
 
     if (data.ok) {
       const validating = await mutate();
       setDeleteProduct(false);
-      setProductInfo({ ...productInfo, status: "closed" });
     }
   };
-
-  const handleAnimationEnd = useCallback(
-    (animationEvent: React.AnimationEvent<HTMLDivElement>) => {
-      if (animationEvent.animationName.includes("exit")) {
-        setProductInfo({
-          status: "closed",
-          id: "",
-          name: "",
-          price: "",
-        });
-      }
-    },
-    []
-  );
 
   return (
     <div className={styles["account-layout"]}>
       <AccountHeader />
-
-      {productInfo.id && (
-        <>
-          <DialogBackdrop
-            onClick={() => {
-              if (!deleteProduct) {
-                setProductInfo({ ...productInfo, status: "closed" });
-              }
-            }}
-          />
-          <Dialog
-            state={productInfo.status}
-            onAnimationEnd={handleAnimationEnd}
-          >
-            <DialogHeader>
-              <DialogTitle>Delete product confirmation</DialogTitle>
-              <DialogDescription>
-                Delete product. Click delete when you are sure
-              </DialogDescription>
-            </DialogHeader>
-
-            <DialogContent>
-              <div style={{ display: "flex" }}>
-                <span style={{ display: "block", width: "53px" }}>ID: </span>
-                <span>{productInfo.id}</span>
-              </div>
-              <div style={{ display: "flex" }}>
-                <span style={{ display: "block", width: "53px" }}>Name:</span>
-                <span>{productInfo.name}</span>
-              </div>
-              <div style={{ display: "flex" }}>
-                <span style={{ display: "block", width: "53px" }}>Price: </span>
-                <span>{productInfo.price}₫</span>
-              </div>
-            </DialogContent>
-
-            <form
-              onSubmit={handleDelete}
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-              }}
-            >
-              <DialogTrigger disabled={deleteProduct}>
-                {deleteProduct && (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-2 h-4 w-4 animate-spin"
-                  >
-                    <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
-                  </svg>
-                )}
-                Delete
-              </DialogTrigger>
-            </form>
-          </Dialog>
-        </>
-      )}
 
       <main className={styles["content-layout"]}>
         <div className={styles["inner-content-layout"]}>
@@ -311,7 +230,10 @@ const Page = () => {
                     <KeyRound
                       width={15}
                       height={15}
-                      style={{ verticalAlign: "middle" }}
+                      style={{
+                        display: "inline-block",
+                        verticalAlign: "middle",
+                      }}
                     />
                     <span style={{ marginLeft: "5px" }}>ID</span>
                   </TableHead>
@@ -462,28 +384,103 @@ const Page = () => {
                                 height={15}
                               />
                             </Link>
-                            <button
-                              type={"button"}
-                              onClick={() =>
-                                setProductInfo({
-                                  status: "open",
-                                  id: _id,
-                                  name: name,
-                                  price: price,
-                                })
-                              }
-                            >
-                              <Delete
-                                style={{
-                                  display: "block",
-                                  verticalAlign: "middle",
-                                  color: "#fafafa",
-                                  textDecoration: "none",
+                            <Dialog>
+                              <DialogTrigger>
+                                <Delete
+                                  style={{
+                                    display: "block",
+                                    verticalAlign: "middle",
+                                    color: "#fafafa",
+                                    textDecoration: "none",
+                                  }}
+                                  width={15}
+                                  height={15}
+                                />
+                              </DialogTrigger>
+                              <DialogContent
+                                onPointerDownOutside={(e) => {
+                                  if (deleteProduct) {
+                                    e.preventDefault();
+                                  }
                                 }}
-                                width={15}
-                                height={15}
-                              />
-                            </button>
+                              >
+                                <DialogHeader>
+                                  <DialogTitle>
+                                    Delete product confirmation
+                                  </DialogTitle>
+                                  <DialogDescription>
+                                    Delete product. Click delete when you are
+                                    sure.
+                                  </DialogDescription>
+                                  <DialogClose
+                                    onClick={(e) => {
+                                      if (deleteProduct) {
+                                        e.preventDefault();
+                                      }
+                                    }}
+                                  />
+                                </DialogHeader>
+                                <div className={styles["delete-information"]}>
+                                  <span
+                                    style={{ display: "block", width: "53px" }}
+                                  >
+                                    ID:
+                                  </span>
+                                  <span>{_id}</span>
+                                </div>
+                                <div className={styles["delete-information"]}>
+                                  <span
+                                    style={{ display: "block", width: "53px" }}
+                                  >
+                                    Name:
+                                  </span>
+                                  <span>{name}</span>
+                                </div>
+                                <div className={styles["delete-information"]}>
+                                  <span
+                                    style={{ display: "block", width: "53px" }}
+                                  >
+                                    Price:
+                                  </span>
+                                  <span>{price}₫</span>
+                                </div>
+                                <form
+                                  onSubmit={(
+                                    event: React.FormEvent<HTMLFormElement>
+                                  ) => handleDelete(event, _id)}
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "flex-end",
+                                  }}
+                                >
+                                  <DialogFooter>
+                                    <Button
+                                      className={styles["delete-loading"]}
+                                      type={"submit"}
+                                      disabled={deleteProduct}
+                                    >
+                                      {deleteProduct && (
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          width="24"
+                                          height="24"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          strokeWidth="2"
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          className="mr-2 h-4 w-4 animate-spin"
+                                        >
+                                          <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                                        </svg>
+                                      )}
+                                      Delete
+                                    </Button>
+                                  </DialogFooter>
+                                </form>
+                              </DialogContent>
+                            </Dialog>
                           </TableAction>
                         </TableCell>
                       </TableRow>
